@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: folsme-backend
+    env: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PAYSTACK_PUBLIC_KEY
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: https://folsmefrontend.vercel.app,https://folsme.com
+  
+  - type: pserv
+    name: folsme-database
+    env: postgresql
+    plan: starter
+    databaseName: folsme_production
+    user: folsme_user
