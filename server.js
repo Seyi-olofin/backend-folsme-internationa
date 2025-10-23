@@ -61,7 +61,13 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Database setup
+// Database setup - Create data directory if it doesn't exist
+const fs = require('fs');
+const dataDir = path.join(__dirname, 'data');
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
 const db = new sqlite3.Database(path.join(__dirname, './data/database.sqlite'), (err) => {
   if (err) {
     console.error('Database connection error:', err.message);
