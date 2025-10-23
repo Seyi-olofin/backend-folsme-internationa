@@ -54,7 +54,7 @@ const upload = multer({
   }
 });
 
-// Create uploads directory
+// Create uploads directory and data directory
 const fs = require('fs');
 const uploadsDir = path.join(__dirname, '../public/uploads');
 if (!fs.existsSync(uploadsDir)) {
@@ -62,7 +62,6 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 // Database setup - Create data directory if it doesn't exist
-const fs = require('fs');
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
