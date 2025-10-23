@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mineral Management | FOLSME Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-logo span {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .admin-sidebar {
+            width: 250px;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            left: 0;
+            top: 80px;
+            padding: 2rem 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 1rem 2rem;
+            color: #666;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: #f8f9fa;
+            color: #004080;
+            border-left-color: #004080;
+        }
+
+        .sidebar-menu i {
+            margin-right: 0.5rem;
+            width: 20px;
+        }
+
+        .admin-main {
+            margin-left: 250px;
+            padding: 2rem;
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #004080;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 1rem;
+        }
+
+        .btn {
+            background: #004080;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 500;
+            margin-right: 1rem;
+        }
+
+        .btn:hover {
+            background: #003366;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #004080;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            color: #d62828;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 1rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #004080;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #004080;
+            box-shadow: 0 0 0 2px rgba(0, 64, 128, 0.1);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #004080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-toast, .error-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            color: white;
+            z-index: 10000;
+            transform: translateX(400px);
+        }
+
+        .success-toast {
+            background: #28a745;
+        }
+
+        .error-toast {
+            background: #dc3545;
+        }
+
+        .success-toast.show, .error-toast.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <div class="admin-logo">
+            <span>FOLSME Admin - Minerals</span>
+        </div>
+        <div class="admin-user">
+            <span>Welcome, Admin</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <aside class="admin-sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="generators.html"><i class="fas fa-cogs"></i> Generators</a></li>
+            <li><a href="minerals.html" class="active"><i class="fas fa-gem"></i> Minerals</a></li>
+            <li><a href="index.html#orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+            <li><a href="index.html#customers"><i class="fas fa-users"></i> Customers</a></li>
+            <li><a href="index.html#analytics"><i class="fas fa-chart-bar"></i> Analytics</a></li>
+            <li><a href="index.html#blog"><i class="fas fa-blog"></i> Blog</a></li>
+            <li><a href="index.html#gallery"><i class="fas fa-images"></i> Gallery</a></li>
+            <li><a href="index.html#achievements"><i class="fas fa-trophy"></i> Achievements</a></li>
+        </ul>
+    </aside>
+
+    <main class="admin-main">
+        <h1 class="page-title">Mineral Management</h1>
+
+        <div style="margin-bottom: 2rem;">
+            <button class="btn btn-primary" onclick="showAddMineralModal()">
+                <i class="fas fa-plus"></i> Add New Mineral
+            </button>
+            <button class="btn" onclick="loadMinerals()">
+                <i class="fas fa-refresh"></i> Refresh
+            </button>
+        </div>
+
+        <div class="product-grid" id="minerals-grid">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">
+                <div class="loading-spinner"></div>
+                <p>Loading minerals...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Mineral Modal -->
+    <div id="add-mineral-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Mineral</h2>
+                <button class="modal-close" onclick="closeMineralModal()">&times;</button>
+            </div>
+            <form id="add-mineral-form">
+                <div class="form-group">
+                    <label for="mineral-name">Mineral Name</label>
+                    <input type="text" id="mineral-name" name="name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="mineral-description">Description</label>
+                    <textarea id="mineral-description" name="description" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="mineral-price">Price (₦)</label>
+                    <input type="number" id="mineral-price" name="price_cents" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="mineral-image">Mineral Image</label>
+                    <input type="file" id="mineral-image" name="image" class="form-control" accept="image/*">
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Add Mineral</button>
+                    <button type="button" class="btn" onclick="closeMineralModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let allMinerals = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMinerals();
+        });
+
+        // Load minerals from API
+        async function loadMinerals() {
+            try {
+                const response = await fetch('/api/admin/products');
+                const data = await response.json();
+
+                if (data.success) {
+                    allMinerals = data.products.filter(p => p.category === 'mineral');
+                    displayMinerals(allMinerals);
+                    showToast(`Loaded ${allMinerals.length} minerals`);
+                } else {
+                    showToast('Error loading minerals', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading minerals:', error);
+                showToast('Error loading minerals', 'error');
+            }
+        }
+
+        // Display minerals
+        function displayMinerals(minerals) {
+            const grid = document.getElementById('minerals-grid');
+
+            if (minerals.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">No minerals found</div>';
+                return;
+            }
+
+            grid.innerHTML = minerals.map(mineral => `
+                <div class="product-card">
+                    <div class="product-image">
+                        ${mineral.images && mineral.images.length > 0 ? 
+                            `<img src="${mineral.images[0]}" alt="${mineral.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-gem\\' style=\\'font-size: 3rem; color: #ccc;\\'></i>'">` :
+                            `<i class="fas fa-gem" style="font-size: 3rem; color: #ccc;"></i>`
+                        }
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${mineral.name}</div>
+                        <div class="product-price">₦${(mineral.price_cents / 100).toLocaleString()}</div>
+                        <div style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+                            Mineral • ${mineral.is_active ? 'Active' : 'Inactive'}
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-sm" onclick="editMineral(${mineral.id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-sm" onclick="toggleMineral(${mineral.id}, ${!mineral.is_active})">
+                                <i class="fas fa-${mineral.is_active ? 'eye-slash' : 'eye'}"></i> ${mineral.is_active ? 'Hide' : 'Show'}
+                            </button>
+                            <button class="btn btn-sm" style="background: #dc3545;" onclick="deleteMineral(${mineral.id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Show add mineral modal
+        function showAddMineralModal() {
+            document.getElementById('add-mineral-modal').style.display = 'block';
+        }
+
+        // Close mineral modal
+        function closeMineralModal() {
+            document.getElementById('add-mineral-modal').style.display = 'none';
+            document.getElementById('add-mineral-form').reset();
+        }
+
+        // Add mineral form submission
+        document.getElementById('add-mineral-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            formData.set('category', 'mineral');
+            formData.set('price_cents', parseInt(formData.get('price_cents')) * 100);
+
+            try {
+                const response = await fetch('/api/admin/products', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Mineral added successfully!');
+                    closeMineralModal();
+                    loadMinerals();
+                } else {
+                    showToast('Error adding mineral: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error adding mineral:', error);
+                showToast('Error adding mineral', 'error');
+            }
+        });
+
+        // Toggle mineral status
+        async function toggleMineral(id, isActive) {
+            try {
+                const response = await fetch(`/api/admin/products/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ is_active: isActive })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(`Mineral ${isActive ? 'activated' : 'deactivated'} successfully`);
+                    loadMinerals();
+                } else {
+                    showToast('Error updating mineral status', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating mineral:', error);
+                showToast('Error updating mineral status', 'error');
+            }
+        }
+
+        // Delete mineral
+        async function deleteMineral(id) {
+            if (!confirm('Are you sure you want to delete this mineral?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/products/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Mineral deleted successfully!');
+                    loadMinerals();
+                } else {
+                    showToast('Error deleting mineral: ' + result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting mineral:', error);
+                showToast('Error deleting mineral', 'error');
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `${type}-toast`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                await fetch('/api/admin/logout', { method: 'POST' });
+                window.location.href = '/admin/login.html';
+            } catch (error) {
+                console.error('Error logging out:', error);
+                window.location.href = '/admin/login.html';
+            }
+        }
+
+        // Edit mineral (placeholder)
+        function editMineral(id) {
+            showToast('Edit functionality coming soon');
+        }
+    </script>
+</body>
+</html>

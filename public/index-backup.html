@@ -1,0 +1,2977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | FOLSME International</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pragati+Narrow&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-logo img {
+            height: 40px;
+        }
+
+        .admin-logo span {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .admin-sidebar {
+            width: 250px;
+            background: var(--sidebar-bg, white);
+            min-height: calc(100vh - 80px);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            left: 0;
+            top: 80px;
+            padding: 2rem 0;
+            transition: all 0.3s ease;
+        }
+
+        /* Dark mode variables */
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --sidebar-bg: white;
+            --card-bg: white;
+            --border-color: #e9ecef;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --sidebar-bg: #2d2d2d;
+            --card-bg: #2d2d2d;
+            --border-color: #404040;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card, .table, .modal-content {
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .theme-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-right: 1rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .theme-toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-switch::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        [data-theme="dark"] .theme-toggle-switch {
+            background: rgba(255,255,255,0.6);
+        }
+
+        [data-theme="dark"] .theme-toggle-switch::before {
+            transform: translateX(26px);
+            background: #004080;
+        }
+
+        .theme-label {
+            font-size: 0.85rem;
+            color: white;
+            font-weight: 500;
+            min-width: 35px;
+        }
+
+        .theme-icon {
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #004080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        /* Enhanced error messages */
+        .error-toast, .success-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            color: white;
+            z-index: 10000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .error-toast {
+            background: #dc3545;
+        }
+
+        .success-toast {
+            background: #28a745;
+        }
+
+        .error-toast.show, .success-toast.show {
+            transform: translateX(0);
+        }
+
+        /* Chart containers */
+        .chart-container {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #004080;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 1rem 2rem;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: #f8f9fa;
+            color: #004080;
+            border-left-color: #004080;
+        }
+
+        .sidebar-menu i {
+            margin-right: 0.5rem;
+            width: 20px;
+        }
+
+        .admin-main {
+            margin-left: 250px;
+            padding: 2rem;
+            margin-top: 80px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #004080;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #004080;
+            margin-bottom: 0.8rem;
+            line-height: 1.2;
+            display: block;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: block;
+            line-height: 1.4;
+        }
+
+        .btn {
+            background: #004080;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: #003366;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #e6442a 0%, #e63e5c 100%);
+        }
+
+        .table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #004080;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-processing { background: #cce5ff; color: #004085; }
+        .status-shipped { background: #d1ecf1; color: #0c5460; }
+        .status-delivered { background: #d4edda; color: #155724; }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #004080;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #004080;
+            box-shadow: 0 0 0 2px rgba(0, 64, 128, 0.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 1rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #004080;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            color: #d62828;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .admin-sidebar.show {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <div class="admin-logo">
+            <img src="/images/logo.svg" alt="FOLSME Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iNCIgZmlsbD0iIzAwNDA4MCIvPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkZPTEVNRTwvdGV4dD4KPHN2Zz4K'">
+            <span>Admin Dashboard</span>
+        </div>
+        <div class="admin-user">
+            <div class="theme-toggle-container">
+                <i class="fas fa-sun theme-icon" id="light-icon"></i>
+                <span class="theme-label" id="theme-label">Light</span>
+                <div class="theme-toggle-switch" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode"></div>
+                <span class="theme-label" id="theme-label-dark">Dark</span>
+                <i class="fas fa-moon theme-icon" id="dark-icon"></i>
+            </div>
+            <span>Welcome, Admin</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <aside class="admin-sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="#dashboard" class="active" onclick="showPage('dashboard')"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="generators.html"><i class="fas fa-cogs"></i> Generators</a></li>
+            <li><a href="minerals.html"><i class="fas fa-gem"></i> Minerals</a></li>
+            <li><a href="orders.html"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+            <li><a href="#customers" onclick="showPage('customers')"><i class="fas fa-users"></i> Customers</a></li>
+            <li><a href="#analytics" onclick="showPage('analytics')"><i class="fas fa-chart-bar"></i> Analytics</a></li>
+            <li><a href="#content" onclick="showPage('content')"><i class="fas fa-edit"></i> Content</a></li>
+            <li><a href="#blog" onclick="showPage('blog')"><i class="fas fa-blog"></i> Blog</a></li>
+            <li><a href="#gallery" onclick="showPage('gallery')"><i class="fas fa-images"></i> Gallery</a></li>
+            <li><a href="#returns" onclick="showPage('returns')"><i class="fas fa-undo"></i> Returns</a></li>
+            <li><a href="#achievements" onclick="showPage('achievements')"><i class="fas fa-trophy"></i> Achievements</a></li>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="admin-main">
+        <!-- Dashboard Page -->
+        <div id="dashboard-page" class="page">
+            <h1 class="page-title">Dashboard Overview</h1>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-orders">0</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-revenue">₦0</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="active-products">0</div>
+                    <div class="stat-label">Active Products</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pending-orders">0</div>
+                    <div class="stat-label">Pending Orders</div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                <button class="btn btn-primary" onclick="showPage('products')">
+                    <i class="fas fa-plus"></i> Add New Product
+                </button>
+                <button class="btn" onclick="showPage('orders')">
+                    <i class="fas fa-list"></i> View All Orders
+                </button>
+                <button class="btn" onclick="showPage('achievements')" style="background: #ff4b2b;">
+                    <i class="fas fa-trophy"></i> Test Achievements
+                </button>
+                <button class="btn" onclick="showPage('blog')" style="background: #004080;">
+                    <i class="fas fa-blog"></i> Test Blog
+                </button>
+            </div>
+
+            <h2>Recent Orders</h2>
+            <div class="table">
+                <table id="recent-orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-orders-body">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2rem; color: #666;">
+                                No recent orders
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Products Page -->
+        <div id="products-page" class="page" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 class="page-title">Product Management</h1>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn" onclick="bulkActivateProducts()" style="background: #28a745;">
+                        <i class="fas fa-check"></i> Bulk Activate
+                    </button>
+                    <button class="btn" onclick="bulkDeactivateProducts()" style="background: #ffc107; color: #000;">
+                        <i class="fas fa-pause"></i> Bulk Deactivate
+                    </button>
+                    <button class="btn btn-primary" onclick="showAddProductModal()">
+                        <i class="fas fa-plus"></i> Add New Product
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search and Filter -->
+            <div style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="form-group" style="margin: 0;">
+                        <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Search Products</label>
+                        <input type="text" id="product-search" class="form-control" placeholder="Search by name..." onkeyup="filterProducts()">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Category Filter</label>
+                        <select id="category-filter" class="form-control" onchange="filterProducts()">
+                            <option value="">All Categories</option>
+                            <option value="generator">Generators</option>
+                            <option value="mineral">Minerals</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Status Filter</label>
+                        <select id="product-status-filter" class="form-control" onchange="filterProducts()">
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: end;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll()">
+                            <span style="font-size: 0.9rem;">Select All</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-grid" id="products-grid">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Orders Page -->
+        <div id="orders-page" class="page" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 class="page-title">Order Management</h1>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn" onclick="exportOrders()" style="background: #28a745;">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Enhanced Search and Filter -->
+            <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="form-group" style="margin: 0;">
+                        <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Search Orders</label>
+                        <input type="text" id="order-search" class="form-control" placeholder="Search by customer, product, invoice..." onkeyup="searchOrders()">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Status Filter</label>
+                        <select id="status-filter" class="form-control" onchange="searchOrders()">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Date From</label>
+                        <input type="date" id="date-from-filter" class="form-control" onchange="searchOrders()">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Date To</label>
+                        <input type="date" id="date-to-filter" class="form-control" onchange="searchOrders()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="table">
+                <table id="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Tracking</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-body">
+                        <!-- Orders will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Enhanced Analytics Page -->
+        <div id="analytics-page" class="page" style="display: none;">
+            <h1 class="page-title">Sales Analytics</h1>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="analytics-total-orders">0</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="analytics-total-revenue">₦0</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="analytics-avg-order">₦0</div>
+                    <div class="stat-label">Average Order Value</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                <div class="chart-container">
+                    <h3 class="chart-title">Sales Trends (Last 30 Days)</h3>
+                    <canvas id="sales-trend-chart" width="400" height="200"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">Geographic Sales</h3>
+                    <canvas id="geographic-chart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div>
+                    <h2>Top Selling Products</h2>
+                    <div class="table">
+                        <table id="analytics-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Orders</th>
+                                    <th>Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analytics-body">
+                                <!-- Analytics data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h2>Top Customers</h2>
+                    <div class="table">
+                        <table id="top-customers-table">
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Orders</th>
+                                    <th>Total Spent</th>
+                                </tr>
+                            </thead>
+                            <tbody id="top-customers-body">
+                                <!-- Top customers will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Management Page -->
+        <div id="customers-page" class="page" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 class="page-title">Customer Management</h1>
+                <button class="btn btn-primary" onclick="showAddCustomerModal()">
+                    <i class="fas fa-plus"></i> Add Customer
+                </button>
+            </div>
+
+            <div class="table">
+                <table id="customers-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Location</th>
+                            <th>Orders</th>
+                            <th>Total Spent</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customers-body">
+                        <!-- Customers will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Content Management Page -->
+        <div id="content-page" class="page" style="display: none;">
+            <h1 class="page-title">Website Content Management</h1>
+
+            <div style="background: var(--card-bg); padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <h3>Homepage Content</h3>
+                <div id="content-editor">
+                    <!-- Content editor will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Blog Management Page -->
+        <div id="blog-page" class="page" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 class="page-title">Blog Management</h1>
+                <button class="btn btn-primary" onclick="showAddBlogModal()">
+                    <i class="fas fa-plus"></i> New Post
+                </button>
+            </div>
+
+            <div class="table">
+                <table id="blog-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Published</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="blog-body">
+                        <!-- Blog posts will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Gallery Management Page -->
+        <div id="gallery-page" class="page" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 class="page-title">Image Gallery</h1>
+                <button class="btn btn-primary" onclick="showUploadImageModal()">
+                    <i class="fas fa-upload"></i> Upload Image
+                </button>
+            </div>
+
+            <div class="product-grid" id="gallery-grid">
+                <!-- Gallery images will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Returns Management Page -->
+        <div id="returns-page" class="page" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 class="page-title">Returns & Refunds</h1>
+                <button class="btn btn-primary" onclick="showAddReturnModal()">
+                    <i class="fas fa-plus"></i> Process Return
+                </button>
+            </div>
+
+            <div class="table">
+                <table id="returns-table">
+                    <thead>
+                        <tr>
+                            <th>Return ID</th>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Reason</th>
+                            <th>Refund Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="returns-body">
+                        <!-- Returns will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Achievements Management Page -->
+        <div id="achievements-page" class="page" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 class="page-title">Achievements Management</h1>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" onclick="showAddAchievementModal()">
+                        <i class="fas fa-plus"></i> Add Achievement
+                    </button>
+                    <button class="btn btn-primary" onclick="showAddAchievementImageModal()">
+                        <i class="fas fa-image"></i> Add Image
+                    </button>
+                </div>
+            </div>
+
+            <!-- Achievements List -->
+            <div style="background: var(--card-bg); padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <h3>Achievements</h3>
+                <div class="table">
+                    <table id="achievements-table">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Stats</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="achievements-body">
+                            <!-- Achievements will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Achievement Images -->
+            <div style="background: var(--card-bg); padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <h3>Achievement Images</h3>
+                <div class="product-grid" id="achievement-images-grid">
+                    <!-- Achievement images will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Product Modal -->
+    <div id="add-product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Product</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="add-product-form">
+                <div class="form-group">
+                    <label for="product-name">Product Name</label>
+                    <input type="text" id="product-name" name="name" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-description">Description</label>
+                    <textarea id="product-description" name="description" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-price">Price (₦)</label>
+                    <input type="number" id="product-price" name="price_cents" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-category">Category</label>
+                    <select id="product-category" name="category" class="form-control" required onchange="toggleProductFields()">
+                        <option value="">Select Category</option>
+                        <option value="generator">Generators</option>
+                        <option value="mineral">Minerals</option>
+                    </select>
+                </div>
+
+                <!-- Generator-specific fields -->
+                <div id="generator-fields" style="display: none;">
+                </div>
+
+                <!-- Mineral-specific fields -->
+                <div id="mineral-fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="mineral-type">Mineral Type</label>
+                        <select id="mineral-type" name="mineral_type" class="form-control">
+                            <option value="">Select Mineral Type</option>
+                            <option value="barite">Barite</option>
+                            <option value="bitumen">Bitumen</option>
+                            <option value="coal">Coal</option>
+                            <option value="gold">Gold</option>
+                            <option value="gypsum">Gypsum</option>
+                            <option value="iron-ore">Iron Ore</option>
+                            <option value="kaolin">Kaolin</option>
+                            <option value="zinc">Zinc</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mineral-grade">Grade/Purity</label>
+                        <input type="text" id="mineral-grade" name="grade" class="form-control" placeholder="e.g., High Grade, 95% Purity">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mineral-origin">Origin/Source</label>
+                        <input type="text" id="mineral-origin" name="origin" class="form-control" placeholder="e.g., Erio-Ekiti Mining Site">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mineral-description">Product Description</label>
+                        <textarea id="mineral-description" name="description" class="form-control" rows="3" placeholder="Describe the mineral properties, uses, etc..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mineral-display-type">Display Type</label>
+                        <select id="mineral-display-type" name="display_type" class="form-control" required>
+                            <option value="">Select Display Type</option>
+                            <option value="showcase">Showcase Only (Minerals We Deal In)</option>
+                            <option value="for-sale">For Sale Only (Buy Mineral Resources)</option>
+                            <option value="both">Both Sections</option>
+                        </select>
+                        <small style="color: #666; margin-top: 0.25rem; display: block;">
+                            Choose where this mineral should appear on the website
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-power">Power Output</label>
+                    <input type="text" id="product-power" name="power" class="form-control" placeholder="e.g., 5 kW, 15 kW, 50 kW" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-fuel">Fuel Type</label>
+                    <input type="text" id="product-fuel" name="fuel" class="form-control" placeholder="e.g., Magnetic Generator Technology" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-features">Features (one per line)</label>
+                    <textarea id="product-features" name="features" class="form-control" rows="4" placeholder="Quiet operation&#10;Low maintenance&#10;Compact design"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-usage-description">Usage Description</label>
+                    <textarea id="product-usage-description" name="usage_description" class="form-control" rows="3" placeholder="Describe what this generator is used for..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-image">Product Image</label>
+                    <input type="file" id="product-image" name="image" class="form-control" accept="image/*" required>
+                    <small style="color: #666; margin-top: 0.25rem; display: block;">Upload a high-quality image (max 5MB)</small>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                    <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <!-- Add Customer Modal -->
+    <div id="add-customer-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Customer</h2>
+                <button class="modal-close" onclick="closeCustomerModal()">&times;</button>
+            </div>
+            <form id="add-customer-form">
+                <div class="form-group">
+                    <label for="customer-name">Full Name</label>
+                    <input type="text" id="customer-name" name="name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-email">Email</label>
+                    <input type="email" id="customer-email" name="email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-phone">Phone</label>
+                    <input type="tel" id="customer-phone" name="phone" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="customer-address">Address</label>
+                    <textarea id="customer-address" name="address" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="customer-city">City</label>
+                    <input type="text" id="customer-city" name="city" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="customer-state">State</label>
+                    <input type="text" id="customer-state" name="state" class="form-control">
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Add Customer</button>
+                    <button type="button" class="btn" onclick="closeCustomerModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Blog Post Modal -->
+    <div id="add-blog-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>Create Blog Post</h2>
+                <button class="modal-close" onclick="closeBlogModal()">&times;</button>
+            </div>
+            <form id="add-blog-form">
+                <div class="form-group">
+                    <label for="blog-title">Title</label>
+                    <input type="text" id="blog-title" name="title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="blog-slug">URL Slug</label>
+                    <input type="text" id="blog-slug" name="slug" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="blog-excerpt">Excerpt</label>
+                    <textarea id="blog-excerpt" name="excerpt" class="form-control" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="blog-content">Content</label>
+                    <textarea id="blog-content" name="content" class="form-control" rows="10" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="blog-status">Status</label>
+                    <select id="blog-status" name="status" class="form-control">
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Create Post</button>
+                    <button type="button" class="btn" onclick="closeBlogModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload Image Modal -->
+    <div id="upload-image-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Upload Image</h2>
+                <button class="modal-close" onclick="closeUploadModal()">&times;</button>
+            </div>
+            <form id="upload-image-form">
+                <div class="form-group">
+                    <label for="upload-image">Select Image</label>
+                    <input type="file" id="upload-image" name="image" class="form-control" accept="image/*" required>
+                </div>
+                <div class="form-group">
+                    <label for="image-alt">Alt Text</label>
+                    <input type="text" id="image-alt" name="alt_text" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="image-category">Category</label>
+                    <select id="image-category" name="category" class="form-control">
+                        <option value="general">General</option>
+                        <option value="products">Products</option>
+                        <option value="blog">Blog</option>
+                        <option value="gallery">Gallery</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                    <button type="button" class="btn" onclick="closeUploadModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Return Modal -->
+    <div id="add-return-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Process Return</h2>
+                <button class="modal-close" onclick="closeReturnModal()">&times;</button>
+            </div>
+            <form id="add-return-form">
+                <div class="form-group">
+                    <label for="return-order-id">Order ID</label>
+                    <input type="number" id="return-order-id" name="order_id" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="return-reason">Reason</label>
+                    <textarea id="return-reason" name="reason" class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="return-amount">Refund Amount (₦)</label>
+                    <input type="number" id="return-amount" name="refund_amount_cents" class="form-control" required>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Process Return</button>
+                    <button type="button" class="btn" onclick="closeReturnModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Achievement Modal -->
+    <div id="add-achievement-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Achievement</h2>
+                <button class="modal-close" onclick="closeAchievementModal()">&times;</button>
+            </div>
+            <form id="add-achievement-form">
+                <div class="form-group">
+                    <label for="achievement-year">Year</label>
+                    <input type="number" id="achievement-year" name="year" class="form-control" required min="2015" max="2030">
+                </div>
+
+                <div class="form-group">
+                    <label for="achievement-title">Achievement Title</label>
+                    <input type="text" id="achievement-title" name="title" class="form-control" required placeholder="e.g., First Major Mining Contract">
+                </div>
+
+                <div class="form-group">
+                    <label for="achievement-description">Description</label>
+                    <textarea id="achievement-description" name="description" class="form-control" rows="4" required placeholder="Describe the achievement and its significance..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="achievement-stats">Statistics (comma-separated)</label>
+                    <input type="text" id="achievement-stats" name="stats" class="form-control" placeholder="e.g., 500+ Tonnes Processed, 10 Employees, 5 States">
+                    <small style="color: #666; margin-top: 0.25rem; display: block;">Optional: Add key statistics separated by commas</small>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Add Achievement</button>
+                    <button type="button" class="btn" onclick="closeAchievementModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Achievement Image Modal -->
+    <div id="add-achievement-image-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Achievement Image</h2>
+                <button class="modal-close" onclick="closeAchievementImageModal()">&times;</button>
+            </div>
+            <form id="add-achievement-image-form">
+                <div class="form-group">
+                    <label for="achievement-image-title">Image Title (Optional)</label>
+                    <input type="text" id="achievement-image-title" name="title" class="form-control" placeholder="e.g., Mining Site Operations">
+                </div>
+
+                <div class="form-group">
+                    <label for="achievement-image-file">Achievement Image</label>
+                    <input type="file" id="achievement-image-file" name="image" class="form-control" accept="image/*" required>
+                    <small style="color: #666; margin-top: 0.25rem; display: block;">Upload a high-quality image showcasing your achievement (max 5MB)</small>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Upload Image</button>
+                    <button type="button" class="btn" onclick="closeAchievementImageModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/debug-dashboard.js"></script>
+    <script>
+        // Global variables
+        let currentPage = 'dashboard';
+        let allProducts = [];
+        let allOrders = [];
+        let allCustomers = [];
+        let allBlogPosts = [];
+        let allGalleryImages = [];
+        let allReturns = [];
+
+        // Debug function to help identify unexpected strings
+        function debugUnexpectedStrings() {
+            console.log('=== DASHBOARD DEBUG INFO ===');
+            console.log('Current page:', currentPage);
+            console.log('All products:', allProducts);
+            console.log('All orders:', allOrders);
+            console.log('All customers:', allCustomers);
+            
+            // Check for any elements with unusual content
+            const allElements = document.querySelectorAll('*');
+            allElements.forEach(el => {
+                if (el.textContent && el.textContent.includes('undefined') || 
+                    el.textContent.includes('null') || 
+                    el.textContent.includes('[object Object]')) {
+                    console.warn('Found unexpected content in element:', el, 'Content:', el.textContent);
+                }
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDarkMode();
+            loadDashboard();
+            
+            // Add debug functions to window for manual testing
+            window.debugDashboard = debugUnexpectedStrings;
+            window.debugAchievements = debugAchievements;
+        });
+
+        // Dark Mode Functions
+        function initializeDarkMode() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleDarkMode() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const lightIcon = document.getElementById('light-icon');
+            const darkIcon = document.getElementById('dark-icon');
+            const themeLabel = document.getElementById('theme-label');
+            const themeLabelDark = document.getElementById('theme-label-dark');
+            
+            if (theme === 'dark') {
+                lightIcon.style.opacity = '0.5';
+                darkIcon.style.opacity = '1';
+                themeLabel.style.opacity = '0.5';
+                themeLabelDark.style.opacity = '1';
+            } else {
+                lightIcon.style.opacity = '1';
+                darkIcon.style.opacity = '0.5';
+                themeLabel.style.opacity = '1';
+                themeLabelDark.style.opacity = '0.5';
+            }
+        }
+
+        // Enhanced Error Handling
+        function showToast(message, type = 'success') {
+            // Sanitize message to prevent unexpected strings
+            const sanitizedMessage = String(message || '').replace(/[^\w\s\-.,!?]/g, '');
+            
+            const toast = document.createElement('div');
+            toast.className = `${type}-toast`;
+            toast.textContent = sanitizedMessage;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        // Enhanced API calls with better error handling
+        async function apiCall(url, options = {}) {
+            try {
+                showLoading();
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                
+                // Check if response is valid JSON
+                const text = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('Invalid JSON response:', text);
+                    throw new Error('Server returned invalid response');
+                }
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'Operation failed');
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                showToast(error.message || 'Network error occurred', 'error');
+                throw error;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Enhanced Navigation
+        function showPage(page) {
+            console.log('🔄 Showing page:', page);
+            
+            try {
+                // Hide all pages
+                document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+
+                // Remove active class from sidebar
+                document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+
+                // Show selected page
+                const pageElement = document.getElementById(page + '-page');
+                console.log('📄 Page element found:', pageElement);
+                
+                if (pageElement) {
+                    pageElement.style.display = 'block';
+                    console.log('✅ Page displayed successfully');
+                } else {
+                    console.error('❌ Page element not found:', page + '-page');
+                    return;
+                }
+
+                // Add active class to current menu item
+                if (event && event.target) {
+                    event.target.classList.add('active');
+                }
+
+                currentPage = page;
+            } catch (error) {
+                console.error('❌ Error in showPage:', error);
+            }
+
+            // Load page data
+            switch(page) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'products':
+                    loadProducts();
+                    break;
+                case 'orders':
+                    loadOrders();
+                    break;
+                case 'customers':
+                    loadCustomers();
+                    break;
+                case 'analytics':
+                    loadAnalytics();
+                    loadCharts();
+                    break;
+                case 'content':
+                    loadContent();
+                    break;
+                case 'blog':
+                    loadBlog();
+                    break;
+                case 'gallery':
+                    loadGallery();
+                    break;
+                case 'returns':
+                    loadReturns();
+                    break;
+                case 'achievements':
+                    console.log('🏆 Loading achievements page...');
+                    console.log('Achievements page element:', document.getElementById('achievements-page'));
+                    loadAchievements();
+                    loadAchievementImages();
+                    break;
+            }
+        }
+
+        // Dashboard functions
+        async function loadDashboard() {
+            try {
+                // Load analytics
+                const analyticsResponse = await fetch('/api/admin/sales/analytics');
+                const analyticsData = await analyticsResponse.json();
+
+                if (analyticsData.success) {
+                    document.getElementById('total-orders').textContent = analyticsData.analytics.total_orders;
+                    const revenue = analyticsData.analytics.total_revenue / 100;
+                    document.getElementById('total-revenue').innerHTML = formatLargeNumber(revenue, '₦');
+                    document.getElementById('analytics-total-orders').textContent = analyticsData.analytics.total_orders;
+                    const analyticsRevenue = analyticsData.analytics.total_revenue / 100;
+                    document.getElementById('analytics-total-revenue').innerHTML = formatLargeNumber(analyticsRevenue, '₦');
+                    const avgOrder = analyticsData.analytics.avg_order_value / 100;
+                    document.getElementById('analytics-avg-order').innerHTML = formatLargeNumber(avgOrder, '₦');
+                }
+
+                // Load products count
+                const productsResponse = await fetch('/api/admin/products');
+                const productsData = await productsResponse.json();
+
+                if (productsData.success) {
+                    const activeProducts = productsData.products.filter(p => p.is_active).length;
+                    document.getElementById('active-products').textContent = activeProducts;
+                }
+
+                // Load recent orders
+                const ordersResponse = await fetch('/api/admin/orders');
+                const ordersData = await ordersResponse.json();
+
+                if (ordersData.success) {
+                    const pendingOrders = ordersData.orders.filter(o => o.status === 'pending').length;
+                    document.getElementById('pending-orders').textContent = pendingOrders;
+
+                    // Show recent 5 orders
+                    const recentOrders = ordersData.orders.slice(0, 5);
+                    displayRecentOrders(recentOrders);
+                }
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        function displayRecentOrders(orders) {
+            const tbody = document.getElementById('recent-orders-body');
+
+            if (!orders || orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: #666;">No recent orders</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = orders.map(order => {
+                // Sanitize data to prevent unexpected strings
+                const sanitizedOrder = {
+                    id: order.id || 'N/A',
+                    customer_name: (order.customer_name || 'Unknown').replace(/[<>]/g, ''),
+                    product_name: (order.product_name || 'N/A').replace(/[<>]/g, ''),
+                    total_amount_cents: isNaN(order.total_amount_cents) ? 0 : order.total_amount_cents,
+                    status: (order.status || 'pending').replace(/[<>]/g, ''),
+                    created_at: order.created_at || new Date().toISOString()
+                };
+                
+                return `
+                    <tr>
+                        <td>#${sanitizedOrder.id}</td>
+                        <td>${sanitizedOrder.customer_name}</td>
+                        <td>${sanitizedOrder.product_name}</td>
+                        <td>₦${(sanitizedOrder.total_amount_cents / 100).toLocaleString()}</td>
+                        <td><span class="status-badge status-${sanitizedOrder.status}">${sanitizedOrder.status}</span></td>
+                        <td>${new Date(sanitizedOrder.created_at).toLocaleDateString()}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Products functions
+        async function loadProducts() {
+            try {
+                const response = await fetch('/api/admin/products');
+                const data = await response.json();
+
+                if (data.success) {
+                    allProducts = data.products;
+                    displayProducts(data.products);
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+            }
+        }
+
+        function displayProducts(products) {
+            const grid = document.getElementById('products-grid');
+
+            if (products.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">No products found</div>';
+                return;
+            }
+
+            grid.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div style="position: relative;">
+                        <input type="checkbox" class="product-checkbox" value="${product.id}" style="position: absolute; top: 10px; left: 10px; z-index: 2;">
+                        <img src="${product.images && product.images.length > 0 ? product.images[0] : '/images/generators/custom.jpeg'}"
+                              alt="${product.name}" class="product-image" onerror="this.src='/images/generators/custom.jpeg'">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">₦${(product.price_cents / 100).toLocaleString()}</div>
+                        <div style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+                            ${product.category} • ${product.is_active ? 'Active' : 'Inactive'}
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-sm" onclick="editProduct(${product.id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-sm" onclick="toggleProduct(${product.id}, ${!product.is_active})">
+                                <i class="fas fa-${product.is_active ? 'eye-slash' : 'eye'}"></i> ${product.is_active ? 'Hide' : 'Show'}
+                            </button>
+                            <button class="btn btn-sm" style="background: #dc3545;" onclick="deleteProduct(${product.id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showAddProductModal() {
+            document.getElementById('add-product-modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('add-product-modal').style.display = 'none';
+            document.getElementById('add-product-form').reset();
+        }
+
+        // Form submission with file upload
+        document.getElementById('add-product-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const category = formData.get('category');
+
+            try {
+                const response = await fetch('/api/admin/products', {
+                    method: 'POST',
+                    body: formData // Send as FormData for file upload
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const productType = category === 'generator' ? 'Generator' : 'Mineral';
+                    alert(`${productType} added successfully!`);
+                    closeModal();
+                    loadProducts();
+                    loadDashboard(); // Refresh stats
+                } else {
+                    alert('Error adding product: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error adding product:', error);
+                alert('Error adding product');
+            }
+        });
+
+        // Toggle product fields based on category
+        function toggleProductFields() {
+            const category = document.getElementById('product-category').value;
+            const generatorFields = document.getElementById('generator-fields');
+            const mineralFields = document.getElementById('mineral-fields');
+
+            if (category === 'generator') {
+                generatorFields.style.display = 'block';
+                mineralFields.style.display = 'none';
+                // Make generator fields required
+                document.getElementById('product-power').required = true;
+                document.getElementById('product-fuel').required = true;
+                document.getElementById('product-description').required = true;
+                // Make mineral fields not required
+                document.getElementById('mineral-type').required = false;
+                document.getElementById('mineral-description').required = false;
+            } else if (category === 'mineral') {
+                generatorFields.style.display = 'none';
+                mineralFields.style.display = 'block';
+                // Make mineral fields required
+                document.getElementById('mineral-type').required = true;
+                document.getElementById('mineral-description').required = true;
+                // Make generator fields not required
+                document.getElementById('product-power').required = false;
+                document.getElementById('product-fuel').required = false;
+                document.getElementById('product-description').required = false;
+            } else {
+                generatorFields.style.display = 'none';
+                mineralFields.style.display = 'none';
+                // Reset all required fields
+                document.getElementById('product-power').required = false;
+                document.getElementById('product-fuel').required = false;
+                document.getElementById('product-description').required = false;
+                document.getElementById('mineral-type').required = false;
+                document.getElementById('mineral-description').required = false;
+            }
+        }
+
+        // Orders functions
+        async function loadOrders() {
+            try {
+                const response = await fetch('/api/admin/orders');
+                const data = await response.json();
+
+                if (data.success) {
+                    allOrders = data.orders;
+                    displayOrders(data.orders);
+                }
+            } catch (error) {
+                console.error('Error loading orders:', error);
+            }
+        }
+
+        function displayOrders(orders) {
+            const tbody = document.getElementById('orders-body');
+
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #666;">No orders found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = orders.map(order => `
+                <tr>
+                    <td>#${order.id}</td>
+                    <td>${order.customer_name}<br><small>${order.customer_email}</small></td>
+                    <td>${order.product_name || 'N/A'}</td>
+                    <td>₦${(order.total_amount_cents / 100).toLocaleString()}</td>
+                    <td><span class="status-badge status-${order.status}">${order.status}</span></td>
+                    <td>
+                        <input type="text" value="${order.tracking_number || ''}" placeholder="Enter tracking number"
+                               onchange="updateTrackingNumber(${order.id}, this.value)"
+                               style="width: 120px; padding: 0.25rem; border: 1px solid #ddd; border-radius: 4px;">
+                    </td>
+                    <td>
+                        <select onchange="updateOrderStatus(${order.id}, this.value)">
+                            <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>Processing</option>
+                            <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                        </select>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function updateOrderStatus(orderId, status) {
+            try {
+                const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    loadOrders();
+                    loadDashboard();
+                } else {
+                    alert('Error updating order status');
+                }
+            } catch (error) {
+                console.error('Error updating order status:', error);
+            }
+        }
+
+        async function updateTrackingNumber(orderId, trackingNumber) {
+            try {
+                const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ tracking_number: trackingNumber })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    loadOrders();
+                } else {
+                    alert('Error updating tracking number');
+                }
+            } catch (error) {
+                console.error('Error updating tracking number:', error);
+            }
+        }
+
+        // Enhanced search with backend API
+        async function searchOrders() {
+            const searchTerm = document.getElementById('order-search').value;
+            const statusFilter = document.getElementById('status-filter').value;
+            const dateFrom = document.getElementById('date-from-filter').value;
+            const dateTo = document.getElementById('date-to-filter').value;
+
+            try {
+                const params = new URLSearchParams();
+                if (searchTerm) params.append('q', searchTerm);
+                if (statusFilter) params.append('status', statusFilter);
+                if (dateFrom) params.append('date_from', dateFrom);
+                if (dateTo) params.append('date_to', dateTo);
+
+                const data = await apiCall(`/api/admin/orders/search?${params}`);
+                allOrders = data.orders;
+                displayOrders(data.orders);
+            } catch (error) {
+                console.error('Error searching orders:', error);
+            }
+        }
+
+        // Debounced search
+        let searchTimeout;
+        function debouncedSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(searchOrders, 300);
+        }
+
+        // Update the onkeyup event to use debounced search
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('order-search');
+            if (searchInput) {
+                searchInput.onkeyup = debouncedSearch;
+            }
+        });
+
+        function filterProducts() {
+            const searchTerm = document.getElementById('product-search').value.toLowerCase();
+            const categoryFilter = document.getElementById('category-filter').value;
+            const statusFilter = document.getElementById('product-status-filter').value;
+
+            const filteredProducts = allProducts.filter(product => {
+                const matchesSearch = !searchTerm || product.name.toLowerCase().includes(searchTerm);
+                const matchesCategory = !categoryFilter || product.category === categoryFilter;
+                const matchesStatus = !statusFilter ||
+                    (statusFilter === 'active' && product.is_active) ||
+                    (statusFilter === 'inactive' && !product.is_active);
+
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+
+            displayProducts(filteredProducts);
+        }
+
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('select-all-checkbox');
+            const productCheckboxes = document.querySelectorAll('.product-checkbox');
+
+            productCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+
+        async function bulkActivateProducts() {
+            const selectedIds = Array.from(document.querySelectorAll('.product-checkbox:checked')).map(cb => parseInt(cb.value));
+
+            if (selectedIds.length === 0) {
+                alert('Please select products to activate');
+                return;
+            }
+
+            if (!confirm(`Activate ${selectedIds.length} product(s)?`)) {
+                return;
+            }
+
+            try {
+                for (const id of selectedIds) {
+                    await fetch(`/api/admin/products/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ is_active: true })
+                    });
+                }
+
+                alert('Products activated successfully!');
+                loadProducts();
+                loadDashboard();
+            } catch (error) {
+                console.error('Error bulk activating products:', error);
+                alert('Error activating products');
+            }
+        }
+
+        async function bulkDeactivateProducts() {
+            const selectedIds = Array.from(document.querySelectorAll('.product-checkbox:checked')).map(cb => parseInt(cb.value));
+
+            if (selectedIds.length === 0) {
+                alert('Please select products to deactivate');
+                return;
+            }
+
+            if (!confirm(`Deactivate ${selectedIds.length} product(s)?`)) {
+                return;
+            }
+
+            try {
+                for (const id of selectedIds) {
+                    await fetch(`/api/admin/products/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ is_active: false })
+                    });
+                }
+
+                alert('Products deactivated successfully!');
+                loadProducts();
+                loadDashboard();
+            } catch (error) {
+                console.error('Error bulk deactivating products:', error);
+                alert('Error deactivating products');
+            }
+        }
+
+        function exportOrders() {
+            if (allOrders.length === 0) {
+                alert('No orders to export');
+                return;
+            }
+
+            // Create CSV content
+            const headers = ['Order ID', 'Customer Name', 'Customer Email', 'Customer Phone', 'Product', 'Quantity', 'Amount', 'Status', 'Tracking Number', 'Order Date'];
+            const csvContent = [
+                headers.join(','),
+                ...allOrders.map(order => [
+                    order.id,
+                    `"${order.customer_name}"`,
+                    order.customer_email,
+                    order.customer_phone || '',
+                    `"${order.product_name || 'N/A'}"`,
+                    order.quantity,
+                    (order.total_amount_cents / 100),
+                    order.status,
+                    order.tracking_number || '',
+                    new Date(order.created_at).toLocaleDateString()
+                ].join(','))
+            ].join('\n');
+
+            // Download CSV file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `orders-export-${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Analytics functions
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/admin/sales/analytics');
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('analytics-total-orders').textContent = data.analytics.total_orders;
+                    const totalRevenue = data.analytics.total_revenue / 100;
+                    const avgOrderValue = data.analytics.avg_order_value / 100;
+                    document.getElementById('analytics-total-revenue').innerHTML = formatLargeNumber(totalRevenue, '₦');
+                    document.getElementById('analytics-avg-order').innerHTML = formatLargeNumber(avgOrderValue, '₦');
+
+                    displayAnalytics(data.analytics.product_sales);
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+
+        function displayAnalytics(productSales) {
+            const tbody = document.getElementById('analytics-body');
+
+            if (productSales.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 2rem; color: #666;">No sales data available</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = productSales.map(product => `
+                <tr>
+                    <td>${product.name}</td>
+                    <td>${product.orders_count}</td>
+                    <td>₦${(product.revenue / 100).toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Utility functions
+        async function editProduct(productId) {
+            try {
+                const response = await fetch(`/api/admin/products`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const product = data.products.find(p => p.id == productId);
+                    if (product) {
+                        showEditModal(product);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading product:', error);
+                alert('Error loading product details');
+            }
+        }
+
+        function showEditModal(product) {
+            // Create edit modal HTML
+            const modalHtml = `
+                <div id="edit-product-modal" class="modal" style="display: block;">
+                    <div class="modal-content" style="max-width: 700px;">
+                        <div class="modal-header">
+                            <h2>Edit Product</h2>
+                            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+                        </div>
+                        <form id="edit-product-form">
+                            <input type="hidden" name="productId" value="${product.id}">
+
+                            <div class="form-group">
+                                <label>Product Name</label>
+                                <input type="text" name="name" class="form-control" value="${product.name}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Price (₦)</label>
+                                <input type="number" name="price_cents" class="form-control" value="${product.price_cents / 100}" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select name="category" class="form-control" required>
+                                    <option value="">Select Category</option>
+                                    <option value="generator" ${product.category === 'generator' ? 'selected' : ''}>Generators</option>
+                                    <option value="mineral" ${product.category === 'mineral' ? 'selected' : ''}>Minerals</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select name="is_active" class="form-control">
+                                    <option value="1" ${product.is_active ? 'selected' : ''}>Active</option>
+                                    <option value="0" ${!product.is_active ? 'selected' : ''}>Inactive</option>
+                                </select>
+                            </div>
+
+                            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                                <button type="submit" class="btn btn-primary">Update Product</button>
+                                <button type="button" class="btn" onclick="closeEditModal()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            // Handle form submission
+            document.getElementById('edit-product-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(e.target);
+                const productId = formData.get('productId');
+
+                const updateData = {
+                    name: formData.get('name'),
+                    price_cents: parseInt(formData.get('price_cents')) * 100,
+                    category: formData.get('category'),
+                    is_active: formData.get('is_active') === '1'
+                };
+
+                try {
+                    const response = await fetch(`/api/admin/products/${productId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(updateData)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert('Product updated successfully!');
+                        closeEditModal();
+                        loadProducts();
+                        loadDashboard();
+                    } else {
+                        alert('Error updating product: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Error updating product:', error);
+                    alert('Error updating product');
+                }
+            });
+        }
+
+        function closeEditModal() {
+            const modal = document.getElementById('edit-product-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        async function toggleProduct(productId, isActive) {
+            try {
+                const response = await fetch(`/api/admin/products/${productId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ is_active: isActive })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    loadProducts();
+                    loadDashboard();
+                } else {
+                    alert('Error updating product');
+                }
+            } catch (error) {
+                console.error('Error updating product:', error);
+            }
+        }
+
+        async function deleteProduct(productId) {
+            if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/products/${productId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Product deleted successfully!');
+                    loadProducts();
+                    loadDashboard();
+                } else {
+                    alert('Error deleting product: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                alert('Error deleting product');
+            }
+        }
+
+        // Utility Functions
+        function formatLargeNumber(number, currency = '') {
+            if (number >= 1000000000) {
+                const billions = (number / 1000000000).toFixed(1);
+                return `<div>${currency}${billions}B</div><small style="font-size: 0.7rem; color: #888; margin-top: 0.2rem; display: block;">${currency}${number.toLocaleString()} (${billions} Billion)</small>`;
+            } else if (number >= 1000000) {
+                const millions = (number / 1000000).toFixed(1);
+                return `<div>${currency}${millions}M</div><small style="font-size: 0.7rem; color: #888; margin-top: 0.2rem; display: block;">${currency}${number.toLocaleString()} (${millions} Million)</small>`;
+            } else if (number >= 1000) {
+                const thousands = (number / 1000).toFixed(1);
+                return `<div>${currency}${thousands}K</div><small style="font-size: 0.7rem; color: #888; margin-top: 0.2rem; display: block;">${currency}${number.toLocaleString()} (${thousands} Thousand)</small>`;
+            } else {
+                return `<div>${currency}${number.toLocaleString()}</div>`;
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#28a745' : '#dc3545'};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 6px;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                font-weight: 500;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Blog Management Functions
+        async function editBlogPost(postId) {
+            try {
+                const response = await fetch(`/api/admin/blog/${postId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    // Redirect to blog admin page with edit parameter
+                    window.location.href = `blog-admin.html?edit=${postId}`;
+                } else {
+                    alert('Error loading blog post');
+                }
+            } catch (error) {
+                console.error('Error loading blog post:', error);
+                alert('Error loading blog post');
+            }
+        }
+
+        async function toggleBlogPost(postId, isPublished) {
+            try {
+                const response = await fetch(`/api/admin/blog/${postId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ is_published: isPublished })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    loadBlogPosts();
+                    showToast(`Blog post ${isPublished ? 'published' : 'hidden'} successfully`);
+                } else {
+                    alert('Error updating blog post');
+                }
+            } catch (error) {
+                console.error('Error updating blog post:', error);
+                alert('Error updating blog post');
+            }
+        }
+
+        async function deleteBlogPost(postId) {
+            if (!confirm('Are you sure you want to delete this blog post? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/blog/${postId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    loadBlogPosts();
+                    showToast('Blog post deleted successfully');
+                } else {
+                    alert('Error deleting blog post');
+                }
+            } catch (error) {
+                console.error('Error deleting blog post:', error);
+                alert('Error deleting blog post');
+            }
+        }
+
+        // Customer Management Functions
+        async function loadCustomers() {
+            try {
+                const data = await apiCall('/api/admin/customers');
+                allCustomers = data.customers;
+                displayCustomers(data.customers);
+            } catch (error) {
+                console.error('Error loading customers:', error);
+            }
+        }
+
+        function displayCustomers(customers) {
+            const tbody = document.getElementById('customers-body');
+            
+            if (customers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #666;">No customers found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = customers.map(customer => `
+                <tr>
+                    <td>${customer.name}</td>
+                    <td>${customer.email}</td>
+                    <td>${customer.phone || 'N/A'}</td>
+                    <td>${customer.city ? `${customer.city}, ${customer.state}` : 'N/A'}</td>
+                    <td>${customer.total_orders}</td>
+                    <td>₦${(customer.total_spent_cents / 100).toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="editCustomer(${customer.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showAddCustomerModal() {
+            document.getElementById('add-customer-modal').style.display = 'block';
+        }
+
+        function closeCustomerModal() {
+            document.getElementById('add-customer-modal').style.display = 'none';
+            document.getElementById('add-customer-form').reset();
+        }
+
+        // Blog Management Functions
+        async function loadBlog() {
+            try {
+                const data = await apiCall('/api/admin/blog');
+                allBlogPosts = data.posts;
+                displayBlogPosts(data.posts);
+            } catch (error) {
+                console.error('Error loading blog posts:', error);
+            }
+        }
+
+        function displayBlogPosts(posts) {
+            const tbody = document.getElementById('blog-body');
+            
+            if (posts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 2rem; color: #666;">No blog posts found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = posts.map(post => `
+                <tr>
+                    <td>${post.title}</td>
+                    <td><span class="status-badge status-${post.status}">${post.status}</span></td>
+                    <td>${post.published_at ? new Date(post.published_at).toLocaleDateString() : 'Not published'}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="editBlogPost(${post.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-sm" onclick="toggleBlogPost(${post.id}, ${!post.is_published})" style="background: ${post.is_published ? '#6c757d' : '#28a745'};">
+                            <i class="fas fa-${post.is_published ? 'eye-slash' : 'eye'}"></i> ${post.is_published ? 'Hide' : 'Show'}
+                        </button>
+                        <button class="btn btn-sm" style="background: #dc3545;" onclick="deleteBlogPost(${post.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showAddBlogModal() {
+            document.getElementById('add-blog-modal').style.display = 'block';
+        }
+
+        function closeBlogModal() {
+            document.getElementById('add-blog-modal').style.display = 'none';
+            document.getElementById('add-blog-form').reset();
+        }
+
+        // Content Management Functions
+        async function loadContent() {
+            try {
+                const data = await apiCall('/api/admin/content/homepage');
+                displayContentEditor(data.content);
+            } catch (error) {
+                console.error('Error loading content:', error);
+            }
+        }
+
+        function displayContentEditor(content) {
+            const editor = document.getElementById('content-editor');
+            
+            const contentBySection = content.reduce((acc, item) => {
+                if (!acc[item.section]) acc[item.section] = {};
+                acc[item.section][item.content_key] = item.content_value;
+                return acc;
+            }, {});
+
+            editor.innerHTML = Object.keys(contentBySection).map(section => `
+                <div style="margin-bottom: 2rem; padding: 1rem; border: 1px solid var(--border-color); border-radius: 6px;">
+                    <h4 style="margin-bottom: 1rem; text-transform: capitalize;">${section} Section</h4>
+                    ${Object.keys(contentBySection[section]).map(key => `
+                        <div class="form-group">
+                            <label>${key.replace('_', ' ').toUpperCase()}</label>
+                            <textarea 
+                                class="form-control" 
+                                data-page="homepage" 
+                                data-section="${section}" 
+                                data-key="${key}"
+                                onchange="updateContent(this)"
+                            >${contentBySection[section][key]}</textarea>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
+        async function updateContent(element) {
+            const page = element.dataset.page;
+            const section = element.dataset.section;
+            const key = element.dataset.key;
+            const value = element.value;
+
+            try {
+                await apiCall('/api/admin/content', {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        page,
+                        section,
+                        content_key: key,
+                        content_value: value
+                    })
+                });
+                showToast('Content updated successfully');
+            } catch (error) {
+                console.error('Error updating content:', error);
+            }
+        }
+
+        // Gallery Management Functions
+        async function loadGallery() {
+            try {
+                const data = await apiCall('/api/admin/gallery');
+                allGalleryImages = data.images;
+                displayGallery(data.images);
+            } catch (error) {
+                console.error('Error loading gallery:', error);
+            }
+        }
+
+        function displayGallery(images) {
+            const grid = document.getElementById('gallery-grid');
+            
+            if (images.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">No images found</div>';
+                return;
+            }
+
+            grid.innerHTML = images.map(image => `
+                <div class="product-card">
+                    <img src="${image.file_path}" alt="${image.alt_text}" class="product-image">
+                    <div class="product-info">
+                        <div class="product-name">${image.original_name}</div>
+                        <div style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+                            ${image.category} • ${(image.file_size / 1024).toFixed(1)} KB
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-sm" onclick="copyImageUrl('${image.file_path}')">
+                                <i class="fas fa-copy"></i> Copy URL
+                            </button>
+                            <button class="btn btn-sm" style="background: #dc3545;" onclick="deleteImage(${image.id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showUploadImageModal() {
+            document.getElementById('upload-image-modal').style.display = 'block';
+        }
+
+        function closeUploadModal() {
+            document.getElementById('upload-image-modal').style.display = 'none';
+            document.getElementById('upload-image-form').reset();
+        }
+
+        function copyImageUrl(url) {
+            navigator.clipboard.writeText(window.location.origin + url);
+            showToast('Image URL copied to clipboard');
+        }
+
+        // Returns Management Functions
+        async function loadReturns() {
+            try {
+                const data = await apiCall('/api/admin/returns');
+                allReturns = data.returns;
+                displayReturns(data.returns);
+            } catch (error) {
+                console.error('Error loading returns:', error);
+            }
+        }
+
+        function displayReturns(returns) {
+            const tbody = document.getElementById('returns-body');
+            
+            if (returns.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #666;">No returns found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = returns.map(returnItem => `
+                <tr>
+                    <td>#${returnItem.id}</td>
+                    <td>#${returnItem.order_id}</td>
+                    <td>${returnItem.customer_name}</td>
+                    <td>${returnItem.reason}</td>
+                    <td>₦${(returnItem.refund_amount_cents / 100).toLocaleString()}</td>
+                    <td><span class="status-badge status-${returnItem.status}">${returnItem.status}</span></td>
+                    <td>
+                        <button class="btn btn-sm" onclick="processReturn(${returnItem.id})">
+                            <i class="fas fa-check"></i> Process
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showAddReturnModal() {
+            document.getElementById('add-return-modal').style.display = 'block';
+        }
+
+        function closeReturnModal() {
+            document.getElementById('add-return-modal').style.display = 'none';
+            document.getElementById('add-return-form').reset();
+        }
+
+        // Enhanced Analytics with Charts
+        async function loadCharts() {
+            try {
+                // Load sales trends
+                const trendsData = await apiCall('/api/admin/analytics/sales-trends?period=30');
+                renderSalesTrendChart(trendsData.trends);
+
+                // Load geographic data
+                const geoData = await apiCall('/api/admin/analytics/geographic-sales');
+                renderGeographicChart(geoData.geographic);
+
+                // Load top customers
+                const customerData = await apiCall('/api/admin/analytics/customer-analytics');
+                displayTopCustomers(customerData.topCustomers);
+            } catch (error) {
+                console.error('Error loading charts:', error);
+            }
+        }
+
+        function renderSalesTrendChart(data) {
+            const ctx = document.getElementById('sales-trend-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => new Date(d.date).toLocaleDateString()),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: data.map(d => d.revenue / 100),
+                        borderColor: '#004080',
+                        backgroundColor: 'rgba(0, 64, 128, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₦' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderGeographicChart(data) {
+            const ctx = document.getElementById('geographic-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(d => d.state),
+                    datasets: [{
+                        data: data.map(d => d.revenue / 100),
+                        backgroundColor: [
+                            '#004080', '#0066cc', '#3399ff', '#66b3ff', '#99ccff'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayTopCustomers(customers) {
+            const tbody = document.getElementById('top-customers-body');
+            
+            if (customers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 2rem; color: #666;">No customer data available</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = customers.map(customer => `
+                <tr>
+                    <td>${customer.name}</td>
+                    <td>${customer.total_orders}</td>
+                    <td>₦${(customer.total_spent_cents / 100).toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Form Submissions
+        document.getElementById('add-customer-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const customerData = Object.fromEntries(formData);
+
+            try {
+                await apiCall('/api/admin/customers', {
+                    method: 'POST',
+                    body: JSON.stringify(customerData)
+                });
+                showToast('Customer added successfully');
+                closeCustomerModal();
+                loadCustomers();
+            } catch (error) {
+                console.error('Error adding customer:', error);
+            }
+        });
+
+        document.getElementById('add-blog-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const blogData = Object.fromEntries(formData);
+
+            try {
+                await apiCall('/api/admin/blog', {
+                    method: 'POST',
+                    body: JSON.stringify(blogData)
+                });
+                showToast('Blog post created successfully');
+                closeBlogModal();
+                loadBlog();
+            } catch (error) {
+                console.error('Error creating blog post:', error);
+            }
+        });
+
+        document.getElementById('upload-image-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+
+            try {
+                const response = await fetch('/api/admin/gallery', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('Image uploaded successfully');
+                    closeUploadModal();
+                    loadGallery();
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        });
+
+        document.getElementById('add-return-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const returnData = Object.fromEntries(formData);
+            returnData.refund_amount_cents = parseInt(returnData.refund_amount_cents) * 100;
+
+            try {
+                await apiCall('/api/admin/returns', {
+                    method: 'POST',
+                    body: JSON.stringify(returnData)
+                });
+                showToast('Return processed successfully');
+                closeReturnModal();
+                loadReturns();
+            } catch (error) {
+                console.error('Error processing return:', error);
+            }
+        });
+
+        async function logout() {
+            try {
+                await fetch('/api/admin/logout', { method: 'POST' });
+                window.location.href = '/admin/login.html';
+            } catch (error) {
+                console.error('Error logging out:', error);
+                window.location.href = '/admin/login.html';
+            }
+        }
+
+        // Achievements Management Functions
+        async function loadAchievements() {
+            try {
+                const data = await apiCall('/api/admin/achievements');
+                if (data && data.achievements) {
+                    displayAchievements(data.achievements);
+                } else {
+                    console.warn('No achievements data received');
+                    displayAchievements([]);
+                }
+            } catch (error) {
+                console.error('Error loading achievements:', error);
+                showToast('Error loading achievements', 'error');
+                displayAchievements([]);
+            }
+        }
+
+        function displayAchievements(achievements) {
+            const tbody = document.getElementById('achievements-body');
+            
+            if (!tbody) {
+                console.error('Achievements table body not found');
+                return;
+            }
+            
+            tbody.innerHTML = '';
+
+            if (!achievements || !Array.isArray(achievements)) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: #666;">No achievements found</td></tr>';
+                return;
+            }
+
+            achievements.forEach(achievement => {
+                // Sanitize achievement data
+                const sanitizedAchievement = {
+                    id: achievement.id || 0,
+                    year: achievement.year || 'N/A',
+                    title: (achievement.title || 'Untitled').replace(/[<>]/g, ''),
+                    description: (achievement.description || 'No description').replace(/[<>]/g, ''),
+                    stats: (achievement.stats || 'N/A').replace(/[<>]/g, ''),
+                    is_active: Boolean(achievement.is_active)
+                };
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${sanitizedAchievement.year}</td>
+                    <td>${sanitizedAchievement.title}</td>
+                    <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${sanitizedAchievement.description}</td>
+                    <td>${sanitizedAchievement.stats}</td>
+                    <td>
+                        <span class="status ${sanitizedAchievement.is_active ? 'active' : 'inactive'}">
+                            ${sanitizedAchievement.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm" onclick="toggleAchievement(${sanitizedAchievement.id}, ${!sanitizedAchievement.is_active})" style="background: ${sanitizedAchievement.is_active ? '#ffc107' : '#28a745'};">
+                            <i class="fas fa-${sanitizedAchievement.is_active ? 'eye-slash' : 'eye'}"></i> ${sanitizedAchievement.is_active ? 'Hide' : 'Show'}
+                        </button>
+                        <button class="btn btn-sm" style="background: #dc3545;" onclick="deleteAchievement(${sanitizedAchievement.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function loadAchievementImages() {
+            try {
+                const data = await apiCall('/api/admin/achievement-images');
+                if (data && data.images) {
+                    displayAchievementImages(data.images);
+                } else {
+                    console.warn('No achievement images data received');
+                    displayAchievementImages([]);
+                }
+            } catch (error) {
+                console.error('Error loading achievement images:', error);
+                showToast('Error loading achievement images', 'error');
+                displayAchievementImages([]);
+            }
+        }
+
+        function displayAchievementImages(images) {
+            const grid = document.getElementById('achievement-images-grid');
+            
+            if (!grid) {
+                console.error('Achievement images grid not found');
+                return;
+            }
+            
+            grid.innerHTML = '';
+
+            if (!images || !Array.isArray(images)) {
+                grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">No achievement images found</div>';
+                return;
+            }
+
+            images.forEach(image => {
+                // Sanitize image data
+                const sanitizedImage = {
+                    id: image.id || 0,
+                    image_url: image.image_url || '/images/default.jpg',
+                    title: (image.title || 'Achievement Image').replace(/[<>]/g, '')
+                };
+                
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'product-card';
+                imageDiv.innerHTML = `
+                    <img src="${sanitizedImage.image_url}" alt="${sanitizedImage.title}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;" onerror="this.src='/images/default.jpg'">
+                    <div style="padding: 1rem;">
+                        <h4>${sanitizedImage.title}</h4>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                            <button class="btn btn-sm" style="background: #dc3545;" onclick="deleteAchievementImage(${sanitizedImage.id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(imageDiv);
+            });
+        }
+
+        // Debug function for achievements
+        function debugAchievements() {
+            console.log('=== ACHIEVEMENTS DEBUG ===');
+            console.log('Achievements body element:', document.getElementById('achievements-body'));
+            console.log('Achievement images grid:', document.getElementById('achievement-images-grid'));
+            console.log('Add achievement modal:', document.getElementById('add-achievement-modal'));
+            
+            // Test API call
+            fetch('/api/admin/achievements')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Achievements API response:', data);
+                })
+                .catch(error => {
+                    console.error('Achievements API error:', error);
+                });
+        }
+
+        // Modal functions
+        function showAddAchievementModal() {
+            document.getElementById('add-achievement-modal').style.display = 'block';
+        }
+
+        function closeAchievementModal() {
+            document.getElementById('add-achievement-modal').style.display = 'none';
+            document.getElementById('add-achievement-form').reset();
+        }
+
+        function showAddAchievementImageModal() {
+            document.getElementById('add-achievement-image-modal').style.display = 'block';
+        }
+
+        function closeAchievementImageModal() {
+            document.getElementById('add-achievement-image-modal').style.display = 'none';
+            document.getElementById('add-achievement-image-form').reset();
+        }
+
+        // Form submissions
+        document.getElementById('add-achievement-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            try {
+                showLoading();
+                const response = await fetch('/api/admin/achievements', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Achievement added successfully!');
+                    closeAchievementModal();
+                    loadAchievements();
+                } else {
+                    throw new Error(result.message || 'Failed to add achievement');
+                }
+            } catch (error) {
+                console.error('Error adding achievement:', error);
+                showToast(error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        document.getElementById('add-achievement-image-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+
+            try {
+                showLoading();
+                const response = await fetch('/api/admin/achievement-images', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Achievement image uploaded successfully!');
+                    closeAchievementImageModal();
+                    loadAchievementImages();
+                } else {
+                    throw new Error(result.message || 'Failed to upload image');
+                }
+            } catch (error) {
+                console.error('Error uploading achievement image:', error);
+                showToast(error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Achievement actions
+        async function toggleAchievement(id, isActive) {
+            try {
+                const response = await fetch(`/api/admin/achievements/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ is_active: isActive })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(`Achievement ${isActive ? 'activated' : 'deactivated'} successfully`);
+                    loadAchievements();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Error updating achievement:', error);
+                showToast('Error updating achievement', 'error');
+            }
+        }
+
+        async function deleteAchievement(id) {
+            if (!confirm('Are you sure you want to delete this achievement? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/achievements/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Achievement deleted successfully');
+                    loadAchievements();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Error deleting achievement:', error);
+                showToast('Error deleting achievement', 'error');
+            }
+        }
+
+        async function deleteAchievementImage(id) {
+            if (!confirm('Are you sure you want to delete this image? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/achievement-images/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Achievement image deleted successfully');
+                    loadAchievementImages();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error('Error deleting achievement image:', error);
+                showToast('Error deleting achievement image', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

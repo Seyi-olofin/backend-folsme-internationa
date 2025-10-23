@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | FOLSME International</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pragati+Narrow&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-logo {
+            margin-bottom: 2rem;
+        }
+
+        .login-logo img {
+            height: 60px;
+            margin-bottom: 1rem;
+        }
+
+        .login-logo h1 {
+            color: #004080;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-logo p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #004080;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #004080;
+            box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
+            color: white;
+            border: none;
+            padding: 0.875rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-login:hover {
+            background: linear-gradient(135deg, #e6442a 0%, #e63e5c 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 75, 43, 0.3);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        .login-footer {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e9ecef;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .login-footer strong {
+            color: #004080;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-logo">
+            <img src="/images/logo.svg" alt="FOLSME Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iOCIgZmlsbD0iIzAwNDA4MCIvPgo8dGV4dCB4PSIzMCIgeT0iMzUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkZPTEVNRTwvdGV4dD4KPHN2Zz4K'">
+            <h1>FOLSME Admin</h1>
+            <p>International Limited</p>
+        </div>
+
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message"></div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" required placeholder="Enter your username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required placeholder="Enter your password">
+            </div>
+
+            <button type="submit" class="btn-login" id="login-btn">
+                <span id="login-text">Sign In</span>
+                <span id="loading-text" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i> Signing In...
+                </span>
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <p><strong>Demo Credentials:</strong><br>
+            Username: <code>admin</code><br>
+            Password: <code>admin123</code></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const loginText = document.getElementById('login-text');
+            const loadingText = document.getElementById('loading-text');
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+
+            // Hide messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+
+            // Show loading state
+            loginBtn.disabled = true;
+            loginText.style.display = 'none';
+            loadingText.style.display = 'inline';
+
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store token in localStorage for dashboard authentication
+                    if (data.token) {
+                        localStorage.setItem('adminToken', data.token);
+                    }
+                    
+                    successMessage.textContent = 'Login successful! Redirecting...';
+                    successMessage.style.display = 'block';
+
+                    // Redirect to dashboard after short delay
+                    setTimeout(() => {
+                        window.location.href = '/admin/index.html';
+                    }, 1000);
+                } else {
+                    errorMessage.textContent = data.message || 'Login failed';
+                    errorMessage.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                errorMessage.textContent = 'Network error. Please try again.';
+                errorMessage.style.display = 'block';
+            } finally {
+                // Reset loading state
+                loginBtn.disabled = false;
+                loginText.style.display = 'inline';
+                loadingText.style.display = 'none';
+            }
+        });
+
+        // Auto-focus username field
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('username').focus();
+        });
+    </script>
+</body>
+</html>

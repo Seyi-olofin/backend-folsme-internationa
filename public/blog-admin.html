@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📝 Blog Manager | FOLSME Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pragati+Narrow&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .blog-header {
+            background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .blog-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .blog-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .quick-actions {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .action-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 250px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .action-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .action-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        .action-description {
+            color: #718096;
+            margin-bottom: 1.5rem;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 64, 128, 0.3);
+        }
+
+        .back-to-dashboard {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 1rem;
+            border-radius: 50%;
+            text-decoration: none;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-to-dashboard:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .stats-section {
+            background: white;
+            margin: 2rem;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+        }
+
+        .view-blog-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .view-blog-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .blog-title {
+                font-size: 2rem;
+                flex-direction: column;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-card {
+                min-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-to-dashboard" title="Back to Main Dashboard">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <header class="blog-header">
+        <h1 class="blog-title">
+            <i class="fas fa-blog" style="color: #87ceeb;"></i>
+            BLOG MANAGER
+        </h1>
+        <p class="blog-subtitle">Create, manage, and publish blog posts for your website</p>
+        <a href="../blog.html" class="view-blog-btn" target="_blank">
+            <i class="fas fa-external-link-alt"></i> View Live Blog
+        </a>
+    </header>
+
+    <div class="quick-actions">
+        <div class="action-card" onclick="goToMainDashboard('blog')">
+            <div class="action-icon" style="color: #28a745;">
+                <i class="fas fa-plus-circle"></i>
+            </div>
+            <h3 class="action-title">Create New Post</h3>
+            <p class="action-description">Write and publish a new blog post with title, content, and excerpt</p>
+            <button class="action-btn">New Post</button>
+        </div>
+
+        <div class="action-card" onclick="goToMainDashboard('blog')">
+            <div class="action-icon" style="color: #007bff;">
+                <i class="fas fa-edit"></i>
+            </div>
+            <h3 class="action-title">Manage Posts</h3>
+            <p class="action-description">Edit existing posts, change status, or delete old content</p>
+            <button class="action-btn">Manage Posts</button>
+        </div>
+
+        <div class="action-card" onclick="goToMainDashboard('blog')">
+            <div class="action-icon" style="color: #ffc107;">
+                <i class="fas fa-eye"></i>
+            </div>
+            <h3 class="action-title">Preview & Publish</h3>
+            <p class="action-description">Review draft posts and publish them to make them live</p>
+            <button class="action-btn">Review Drafts</button>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <h2 style="text-align: center; margin-bottom: 1rem; color: #2d3748;">
+            <i class="fas fa-chart-line" style="margin-right: 0.5rem;"></i>
+            Blog Statistics
+        </h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="total-posts">-</div>
+                <div class="stat-label">Total Posts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="published-posts">-</div>
+                <div class="stat-label">Published Posts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="draft-posts">-</div>
+                <div class="stat-label">Draft Posts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="latest-post">-</div>
+                <div class="stat-label">Days Since Last Post</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load blog stats
+        async function loadBlogStats() {
+            try {
+                const response = await fetch('/api/admin/blog');
+                const data = await response.json();
+
+                if (data.success && data.posts) {
+                    const posts = data.posts;
+                    const publishedPosts = posts.filter(p => p.status === 'published');
+                    const draftPosts = posts.filter(p => p.status === 'draft');
+                    
+                    // Calculate days since last post
+                    let daysSinceLastPost = 'N/A';
+                    if (publishedPosts.length > 0) {
+                        const latestPost = publishedPosts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+                        const daysDiff = Math.floor((new Date() - new Date(latestPost.created_at)) / (1000 * 60 * 60 * 24));
+                        daysSinceLastPost = daysDiff;
+                    }
+
+                    document.getElementById('total-posts').textContent = posts.length;
+                    document.getElementById('published-posts').textContent = publishedPosts.length;
+                    document.getElementById('draft-posts').textContent = draftPosts.length;
+                    document.getElementById('latest-post').textContent = daysSinceLastPost;
+                }
+            } catch (error) {
+                console.error('Error loading blog stats:', error);
+                // Set default values
+                document.getElementById('total-posts').textContent = '0';
+                document.getElementById('published-posts').textContent = '0';
+                document.getElementById('draft-posts').textContent = '0';
+                document.getElementById('latest-post').textContent = 'N/A';
+            }
+        }
+
+        // Go to main dashboard blog section
+        function goToMainDashboard(section) {
+            window.location.href = `index.html#${section}`;
+        }
+
+        // Load stats when page loads
+        document.addEventListener('DOMContentLoaded', loadBlogStats);
+    </script>
+</body>
+</html>

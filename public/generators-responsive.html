@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Management | FOLSME Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .admin-header {
+            background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .admin-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-nav a:hover,
+        .admin-nav a.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #004080;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #004080;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0066cc;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        /* Cards */
+        .dashboard-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #004080;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Loading and empty states */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .admin-header {
+                padding: 0.75rem 1rem;
+            }
+
+            .admin-logo {
+                font-size: 1rem;
+            }
+
+            .admin-nav {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 250px;
+                height: calc(100vh - 70px);
+                background: white;
+                flex-direction: column;
+                padding: 1rem 0;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+                transition: left 0.3s ease;
+                z-index: 999;
+                gap: 0;
+            }
+
+            .admin-nav.open {
+                left: 0;
+            }
+
+            .admin-nav a {
+                color: #333;
+                padding: 1rem 1.5rem;
+                border-bottom: 1px solid #e9ecef;
+                border-radius: 0;
+            }
+
+            .admin-nav a:hover,
+            .admin-nav a.active {
+                background: #f8f9fa;
+                color: #004080;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .card-header {
+                padding: 1rem;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .card-content {
+                padding: 1rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 0.5rem;
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 0.5rem;
+            }
+
+            .card-header,
+            .card-content {
+                padding: 0.75rem;
+            }
+
+            .data-table {
+                font-size: 0.8rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 0.4rem;
+            }
+        }
+
+        /* Mobile overlay */
+        .mobile-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            display: none;
+        }
+
+        .mobile-overlay.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-overlay" onclick="closeMobileMenu()"></div>
+    
+    <header class="admin-header">
+        <div class="admin-logo">
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <i class="fas fa-cog"></i> FOLSME Admin
+        </div>
+        <nav class="admin-nav">
+            <a href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="generators.html" class="active"><i class="fas fa-bolt"></i> Generators</a>
+            <a href="minerals.html"><i class="fas fa-gem"></i> Minerals</a>
+            <a href="orders.html"><i class="fas fa-shopping-cart"></i> Orders</a>
+            <a href="blog-admin.html"><i class="fas fa-blog"></i> Blog</a>
+            <a href="achievements-admin.html"><i class="fas fa-trophy"></i> Achievements</a>
+            <a href="../index.html" target="_blank"><i class="fas fa-external-link-alt"></i> View Site</a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Generator Management</h1>
+            <button class="btn btn-primary" onclick="showAddForm()">
+                <i class="fas fa-plus"></i> Add New Generator
+            </button>
+        </div>
+
+        <!-- Add/Edit Form -->
+        <div id="generator-form" class="dashboard-card" style="display: none;">
+            <div class="card-header">
+                <h2 class="card-title" id="form-title">Add New Generator</h2>
+                <button class="btn btn-danger" onclick="hideForm()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+            <div class="card-content">
+                <form id="generatorForm" onsubmit="saveGenerator(event)">
+                    <input type="hidden" id="generatorId">
+                    
+                    <div class="form-group">
+                        <label for="name">Generator Name *</label>
+                        <input type="text" id="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="price_cents">Price (in cents) *</label>
+                        <input type="number" id="price_cents" required min="0">
+                        <small>Enter price in cents (e.g., 250000000 for ₦2,500,000)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" required>
+                            <option value="">Select Category</option>
+                            <option value="generator">Generator</option>
+                            <option value="residential">Residential</option>
+                            <option value="commercial">Commercial</option>
+                            <option value="industrial">Industrial</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="specs">Specifications (JSON format)</label>
+                        <textarea id="specs" rows="4" placeholder='["Power: 5kW", "Fuel: Magnetic Technology", "Features: Quiet Operation"]'></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stock_quantity">Stock Quantity</label>
+                        <input type="number" id="stock_quantity" min="0" value="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="is_active">Status</label>
+                        <select id="is_active">
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Save Generator
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Generators List -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2 class="card-title">Generators List</h2>
+                <button class="btn btn-primary" onclick="loadGenerators()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+            <div class="card-content">
+                <div id="generators-container">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Loading generators...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let generators = [];
+        let editingId = null;
+
+        // Mobile menu functions
+        function toggleMobileMenu() {
+            const nav = document.querySelector('.admin-nav');
+            const overlay = document.querySelector('.mobile-overlay');
+            
+            nav.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        function closeMobileMenu() {
+            const nav = document.querySelector('.admin-nav');
+            const overlay = document.querySelector('.mobile-overlay');
+            
+            nav.classList.remove('open');
+            overlay.classList.remove('show');
+        }
+
+        // Close menu when clicking nav links on mobile
+        document.querySelectorAll('.admin-nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    closeMobileMenu();
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                closeMobileMenu();
+            }
+        });
+
+        // Load generators
+        async function loadGenerators() {
+            try {
+                const response = await fetch('/api/admin/products?category=generator', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('adminToken')
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load generators');
+                }
+                
+                const data = await response.json();
+                generators = data.products || [];
+                displayGenerators();
+                
+            } catch (error) {
+                console.error('Error loading generators:', error);
+                document.getElementById('generators-container').innerHTML = 
+                    '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load generators. Please try again.</p></div>';
+            }
+        }
+
+        // Display generators
+        function displayGenerators() {
+            const container = document.getElementById('generators-container');
+            
+            if (generators.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bolt"></i>
+                        <p>No generators found. Add your first generator to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const tableHTML = `
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${generators.map(generator => `
+                                <tr>
+                                    <td>
+                                        <strong>${generator.name}</strong>
+                                        ${generator.description ? `<br><small>${generator.description.substring(0, 50)}...</small>` : ''}
+                                    </td>
+                                    <td>₦${(generator.price_cents / 100).toLocaleString('en-NG', { minimumFractionDigits: 2 })}</td>
+                                    <td>${generator.category}</td>
+                                    <td>${generator.stock_quantity || 0}</td>
+                                    <td>
+                                        <span class="status-badge ${generator.is_active ? 'status-active' : 'status-inactive'}">
+                                            ${generator.is_active ? 'Active' : 'Inactive'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-warning" onclick="editGenerator(${generator.id})" style="margin-right: 0.5rem; margin-bottom: 0.5rem;">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="btn btn-danger" onclick="deleteGenerator(${generator.id})">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = tableHTML;
+        }
+
+        // Show add form
+        function showAddForm() {
+            editingId = null;
+            document.getElementById('form-title').textContent = 'Add New Generator';
+            document.getElementById('generatorForm').reset();
+            document.getElementById('generatorId').value = '';
+            document.getElementById('generator-form').style.display = 'block';
+            document.getElementById('name').focus();
+        }
+
+        // Hide form
+        function hideForm() {
+            document.getElementById('generator-form').style.display = 'none';
+            editingId = null;
+        }
+
+        // Edit generator
+        function editGenerator(id) {
+            const generator = generators.find(g => g.id === id);
+            if (!generator) return;
+
+            editingId = id;
+            document.getElementById('form-title').textContent = 'Edit Generator';
+            document.getElementById('generatorId').value = generator.id;
+            document.getElementById('name').value = generator.name;
+            document.getElementById('description').value = generator.description || '';
+            document.getElementById('price_cents').value = generator.price_cents;
+            document.getElementById('category').value = generator.category;
+            document.getElementById('specs').value = generator.specs || '';
+            document.getElementById('stock_quantity').value = generator.stock_quantity || 0;
+            document.getElementById('is_active').value = generator.is_active ? '1' : '0';
+            
+            document.getElementById('generator-form').style.display = 'block';
+            document.getElementById('name').focus();
+        }
+
+        // Save generator
+        async function saveGenerator(event) {
+            event.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                price_cents: parseInt(document.getElementById('price_cents').value),
+                category: document.getElementById('category').value,
+                specs: document.getElementById('specs').value,
+                stock_quantity: parseInt(document.getElementById('stock_quantity').value) || 0,
+                is_active: document.getElementById('is_active').value === '1'
+            };
+
+            try {
+                const url = editingId ? `/api/admin/products/${editingId}` : '/api/admin/products';
+                const method = editingId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('adminToken')
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert(editingId ? 'Generator updated successfully!' : 'Generator added successfully!');
+                    hideForm();
+                    loadGenerators();
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + (error.message || 'Failed to save generator'));
+                }
+            } catch (error) {
+                console.error('Error saving generator:', error);
+                alert('Error saving generator. Please try again.');
+            }
+        }
+
+        // Delete generator
+        async function deleteGenerator(id) {
+            if (!confirm('Are you sure you want to delete this generator?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/products/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('adminToken')
+                    }
+                });
+
+                if (response.ok) {
+                    alert('Generator deleted successfully!');
+                    loadGenerators();
+                } else {
+                    alert('Failed to delete generator');
+                }
+            } catch (error) {
+                console.error('Error deleting generator:', error);
+                alert('Error deleting generator. Please try again.');
+            }
+        }
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            if (checkAuth()) {
+                loadGenerators();
+            }
+        });
+    </script>
+</body>
+</html>

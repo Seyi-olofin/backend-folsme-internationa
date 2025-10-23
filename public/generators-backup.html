@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Management | FOLSME Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pragati+Narrow&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Dark mode variables */
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --sidebar-bg: white;
+            --card-bg: white;
+            --border-color: #e9ecef;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --sidebar-bg: #2d2d2d;
+            --card-bg: #2d2d2d;
+            --border-color: #404040;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-logo img {
+            height: 40px;
+        }
+
+        .admin-logo span {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .admin-sidebar {
+            width: 250px;
+            background: var(--sidebar-bg);
+            min-height: calc(100vh - 80px);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            left: 0;
+            top: 80px;
+            padding: 2rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-right: 1rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .theme-toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-switch::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        [data-theme="dark"] .theme-toggle-switch {
+            background: rgba(255,255,255,0.6);
+        }
+
+        [data-theme="dark"] .theme-toggle-switch::before {
+            transform: translateX(26px);
+            background: #004080;
+        }
+
+        .theme-label {
+            font-size: 0.85rem;
+            color: white;
+            font-weight: 500;
+            min-width: 35px;
+        }
+
+        .theme-icon {
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        .product-card, .modal-content {
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #004080;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+
+        .loading-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        /* Enhanced error messages */
+        .error-toast, .success-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 6px;
+            color: white;
+            z-index: 10000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .error-toast {
+            background: #dc3545;
+        }
+
+        .success-toast {
+            background: #28a745;
+        }
+
+        .error-toast.show, .success-toast.show {
+            transform: translateX(0);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 1rem 2rem;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: #f8f9fa;
+            color: #004080;
+            border-left-color: #004080;
+        }
+
+        .sidebar-menu i {
+            margin-right: 0.5rem;
+            width: 20px;
+        }
+
+        .admin-main {
+            margin-left: 250px;
+            padding: 2rem;
+            margin-top: 80px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #004080;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 1rem;
+        }
+
+        .btn {
+            background: #004080;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn:hover {
+            background: #003366;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #e6442a 0%, #e63e5c 100%);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #004080;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #004080;
+            box-shadow: 0 0 0 2px rgba(0, 64, 128, 0.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 1rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 1rem;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #004080;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            color: #d62828;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .admin-sidebar.show {
+                transform: translateX(0);
+            }
+
+            .admin-main {
+                margin-left: 0;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <div class="admin-logo">
+            <img src="/images/logo.svg" alt="FOLSME Logo" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiByeD0iNCIgZmlsbD0iIzAwNDA4MCIvPgo8dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkZPTEVNRTwvdGV4dD4KPHN2Zz4K'">
+            <span>Generator Management</span>
+        </div>
+        <div class="admin-user">
+            <div class="theme-toggle-container">
+                <i class="fas fa-sun theme-icon" id="light-icon"></i>
+                <span class="theme-label" id="theme-label">Light</span>
+                <div class="theme-toggle-switch" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode"></div>
+                <span class="theme-label" id="theme-label-dark">Dark</span>
+                <i class="fas fa-moon theme-icon" id="dark-icon"></i>
+            </div>
+            <span>Welcome, Admin</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <aside class="admin-sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="generators.html" class="active"><i class="fas fa-cogs"></i> Generators</a></li>
+            <li><a href="minerals.html"><i class="fas fa-gem"></i> Minerals</a></li>
+            <li><a href="index.html#orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+            <li><a href="index.html#customers"><i class="fas fa-users"></i> Customers</a></li>
+            <li><a href="index.html#analytics"><i class="fas fa-chart-bar"></i> Analytics</a></li>
+            <li><a href="index.html#content"><i class="fas fa-edit"></i> Content</a></li>
+            <li><a href="index.html#blog"><i class="fas fa-blog"></i> Blog</a></li>
+            <li><a href="index.html#gallery"><i class="fas fa-images"></i> Gallery</a></li>
+            <li><a href="index.html#returns"><i class="fas fa-undo"></i> Returns</a></li>
+        </ul>
+    </aside>
+
+    <main class="admin-main">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1 class="page-title">Generator Management</h1>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn" onclick="bulkActivateProducts()" style="background: #28a745;">
+                    <i class="fas fa-check"></i> Bulk Activate
+                </button>
+                <button class="btn" onclick="bulkDeactivateProducts()" style="background: #ffc107; color: #000;">
+                    <i class="fas fa-pause"></i> Bulk Deactivate
+                </button>
+                <button class="btn btn-primary" onclick="showAddGeneratorModal()">
+                    <i class="fas fa-plus"></i> Add Generator
+                </button>
+            </div>
+        </div>
+
+        <!-- Enhanced Search and Filter -->
+        <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div class="form-group" style="margin: 0;">
+                    <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Search Generators</label>
+                    <input type="text" id="generator-search" class="form-control" placeholder="Search by name..." onkeyup="filterGenerators()">
+                </div>
+                <div class="form-group" style="margin: 0;">
+                    <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Power Range</label>
+                    <select id="power-filter" class="form-control" onchange="filterGenerators()">
+                        <option value="">All Power Ranges</option>
+                        <option value="small">Small (1-10kW)</option>
+                        <option value="medium">Medium (11-50kW)</option>
+                        <option value="industrial">Industrial (51-200kW)</option>
+                        <option value="commercial">Commercial (201-500kW)</option>
+                        <option value="custom">Custom (500kW+)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin: 0;">
+                    <label style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block;">Status</label>
+                    <select id="generator-status-filter" class="form-control" onchange="filterGenerators()">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div style="display: flex; align-items: end;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="select-all-generators" onchange="toggleSelectAllGenerators()">
+                        <span style="font-size: 0.9rem;">Select All</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-grid" id="generators-grid">
+            <!-- Generators will be loaded here -->
+        </div>
+    </main>
+
+    <!-- Add Generator Modal -->
+    <div id="add-generator-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Generator</h2>
+                <button class="modal-close" onclick="closeGeneratorModal()">&times;</button>
+            </div>
+            <form id="add-generator-form">
+                <div class="form-group">
+                    <label for="generator-name">Generator Name</label>
+                    <input type="text" id="generator-name" name="name" class="form-control" required placeholder="e.g., Small Magnetic Generator 5kW">
+                </div>
+
+                <div class="form-group">
+                    <label for="generator-description">Description</label>
+                    <textarea id="generator-description" name="description" class="form-control" rows="3" placeholder="Brief description of the generator"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="generator-price">Price (₦)</label>
+                    <input type="number" id="generator-price" name="price_cents" class="form-control" required placeholder="25000000">
+                </div>
+
+                <div class="form-group">
+                    <label for="generator-power">Power Output</label>
+                    <input type="text" id="generator-power" name="power" class="form-control" required placeholder="e.g., 5 kW, 15 kW, 50 kW">
+                </div>
+
+                <div class="form-group">
+                    <label for="generator-category">Generator Category</label>
+                    <select id="generator-category" name="generator_category" class="form-control" required>
+                        <option value="">Select Category</option>
+                        <option value="small">Small Generator (1-10kW)</option>
+                        <option value="medium">Medium Generator (11-50kW)</option>
+                        <option value="industrial">Industrial Generator (51-200kW)</option>
+                        <option value="commercial">Commercial Generator (201-500kW)</option>
+                        <option value="custom">Custom Generator (500kW+)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="generator-fuel">Fuel Type</label>
+                    <input type="text" id="generator-fuel" name="fuel" class="form-control" required placeholder="e.g., Magnetic Generator Technology">
+                </div>
+
+                <div class="form-group">
+                    <label for="generator-features">Features (one per line)</label>
+                    <textarea id="generator-features" name="features" class="form-control" rows="4" placeholder="Quiet operation&#10;Low maintenance&#10;Compact design&#10;Weather resistant&#10;Remote monitoring"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="generator-usage-description">Usage Description</label>
+                    <textarea id="generator-usage-description" name="usage_description" class="form-control" rows="3" required placeholder="Describe what this generator is used for (homes, offices, factories, etc.)..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="generator-availability">Availability Status</label>
+                    <select id="generator-availability" name="availability" class="form-control" required>
+                        <option value="available">Available</option>
+                        <option value="limited">Limited Stock</option>
+                        <option value="pre-order">Pre-Order Only</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="generator-image">Generator Image</label>
+                    <input type="file" id="generator-image" name="image" class="form-control" accept="image/*" required>
+                    <small style="color: #666; margin-top: 0.25rem; display: block;">Upload a high-quality image of the generator (max 5MB)</small>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Add Generator</button>
+                    <button type="button" class="btn" onclick="closeGeneratorModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Generator Modal -->
+    <div id="editGeneratorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Generator</h2>
+                <button class="modal-close" onclick="closeEditGeneratorModal()">&times;</button>
+            </div>
+            <form id="edit-generator-form">
+                <input type="hidden" id="editGeneratorId">
+                
+                <div id="editCurrentImage" style="margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                    <!-- Current image will be displayed here -->
+                </div>
+
+                <div class="form-group">
+                    <label for="editGeneratorName">Generator Name</label>
+                    <input type="text" id="editGeneratorName" name="name" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editGeneratorDescription">Description</label>
+                    <textarea id="editGeneratorDescription" name="description" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="editGeneratorPrice">Price (₦)</label>
+                    <input type="number" id="editGeneratorPrice" name="price_cents" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Specifications</label>
+                    <div id="editGeneratorSpecs">
+                        <!-- Specs will be populated dynamically -->
+                    </div>
+                    <button type="button" onclick="addEditSpecField('')" class="btn btn-sm" style="background: #28a745; margin-top: 0.5rem;">
+                        <i class="fas fa-plus"></i> Add Specification
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="editGeneratorImage">Update Image (optional)</label>
+                    <input type="file" id="editGeneratorImage" name="image" class="form-control" accept="image/*">
+                    <small style="color: #666; margin-top: 0.25rem; display: block;">Leave empty to keep current image</small>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Update Generator</button>
+                    <button type="button" class="btn" onclick="closeEditGeneratorModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <script>
+        let allGenerators = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDarkMode();
+            loadGenerators();
+        });
+
+        // Dark Mode Functions
+        function initializeDarkMode() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleDarkMode() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const lightIcon = document.getElementById('light-icon');
+            const darkIcon = document.getElementById('dark-icon');
+            const themeLabel = document.getElementById('theme-label');
+            const themeLabelDark = document.getElementById('theme-label-dark');
+            
+            if (theme === 'dark') {
+                lightIcon.style.opacity = '0.5';
+                darkIcon.style.opacity = '1';
+                themeLabel.style.opacity = '0.5';
+                themeLabelDark.style.opacity = '1';
+            } else {
+                lightIcon.style.opacity = '1';
+                darkIcon.style.opacity = '0.5';
+                themeLabel.style.opacity = '1';
+                themeLabelDark.style.opacity = '0.5';
+            }
+        }
+
+        // Enhanced Error Handling
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `${type}-toast`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        // Enhanced API calls with better error handling
+        async function apiCall(url, options = {}) {
+            try {
+                showLoading();
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.message || 'Operation failed');
+                }
+                
+                return data;
+            } catch (error) {
+                showToast(error.message, 'error');
+                throw error;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Enhanced Load generators
+        async function loadGenerators() {
+            try {
+                const data = await apiCall('/api/admin/products');
+                allGenerators = data.products.filter(p => p.category === 'generator');
+                displayGenerators(allGenerators);
+                showToast(`Loaded ${allGenerators.length} generators`);
+            } catch (error) {
+                console.error('Error loading generators:', error);
+            }
+        }
+
+        // Display generators
+        function displayGenerators(generators) {
+            const grid = document.getElementById('generators-grid');
+
+            if (generators.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #666;">No generators found</div>';
+                return;
+            }
+
+            grid.innerHTML = generators.map(generator => `
+                <div class="product-card">
+                    <div style="position: relative;">
+                        <input type="checkbox" class="generator-checkbox" value="${generator.id}" style="position: absolute; top: 10px; left: 10px; z-index: 2;">
+                        <img src="${generator.images && generator.images.length > 0 ? generator.images[0] : '/images/generators/custom.jpeg'}"
+                              alt="${generator.name}" class="product-image" onerror="this.src='/images/generators/custom.jpeg'">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-name">${generator.name}</div>
+                        <div class="product-price">₦${(generator.price_cents / 100).toLocaleString()}</div>
+                        <div style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+                            Generator • ${generator.is_active ? 'Active' : 'Inactive'}
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn btn-sm" onclick="editGenerator(${generator.id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-sm" onclick="toggleGenerator(${generator.id}, ${!generator.is_active})">
+                                <i class="fas fa-${generator.is_active ? 'eye-slash' : 'eye'}"></i> ${generator.is_active ? 'Hide' : 'Show'}
+                            </button>
+                            <button class="btn btn-sm" style="background: #dc3545;" onclick="deleteGenerator(${generator.id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter generators
+        function filterGenerators() {
+            const searchTerm = document.getElementById('generator-search').value.toLowerCase();
+            const powerFilter = document.getElementById('power-filter').value;
+            const statusFilter = document.getElementById('generator-status-filter').value;
+
+            const filteredGenerators = allGenerators.filter(generator => {
+                const matchesSearch = !searchTerm || generator.name.toLowerCase().includes(searchTerm);
+                const matchesPower = !powerFilter || generator.specs.some(spec => spec.includes(powerFilter));
+                const matchesStatus = !statusFilter ||
+                    (statusFilter === 'active' && generator.is_active) ||
+                    (statusFilter === 'inactive' && !generator.is_active);
+
+                return matchesSearch && matchesPower && matchesStatus;
+            });
+
+            displayGenerators(filteredGenerators);
+        }
+
+        // Modal functions
+        function showAddGeneratorModal() {
+            document.getElementById('add-generator-modal').style.display = 'block';
+        }
+
+        function closeGeneratorModal() {
+            document.getElementById('add-generator-modal').style.display = 'none';
+            document.getElementById('add-generator-form').reset();
+        }
+
+        function closeEditGeneratorModal() {
+            document.getElementById('editGeneratorModal').style.display = 'none';
+            document.getElementById('edit-generator-form').reset();
+        }
+
+        // Add spec field for edit form
+        function addEditSpecField(value = '') {
+            const container = document.getElementById('editGeneratorSpecs');
+            const specDiv = document.createElement('div');
+            specDiv.className = 'spec-field';
+            specDiv.style.cssText = 'display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;';
+            
+            specDiv.innerHTML = `
+                <input type="text" class="form-control edit-spec-input" value="${value}" placeholder="e.g., Power: 5kW" style="flex: 1;">
+                <button type="button" onclick="this.parentElement.remove()" class="btn btn-sm" style="background: #dc3545; color: white; padding: 0.25rem 0.5rem;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            
+            container.appendChild(specDiv);
+        }
+
+        // Enhanced Form submission
+        document.getElementById('add-generator-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            formData.set('category', 'generator'); // Ensure category is set
+
+            try {
+                showLoading();
+                const response = await fetch('/api/admin/products', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Generator added successfully!');
+                    closeGeneratorModal();
+                    loadGenerators();
+                } else {
+                    throw new Error(result.message || 'Failed to add generator');
+                }
+            } catch (error) {
+                console.error('Error adding generator:', error);
+                showToast(error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Edit generator form submission
+        document.getElementById('edit-generator-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const generatorId = document.getElementById('editGeneratorId').value;
+            const formData = new FormData();
+            
+            // Add basic fields
+            formData.set('name', document.getElementById('editGeneratorName').value);
+            formData.set('description', document.getElementById('editGeneratorDescription').value);
+            formData.set('price_cents', document.getElementById('editGeneratorPrice').value * 100);
+            formData.set('category', 'generator');
+            
+            // Collect specs
+            const specInputs = document.querySelectorAll('.edit-spec-input');
+            const specs = Array.from(specInputs)
+                .map(input => input.value.trim())
+                .filter(spec => spec !== '');
+            formData.set('specs', JSON.stringify(specs));
+            
+            // Add image if selected
+            const imageFile = document.getElementById('editGeneratorImage').files[0];
+            if (imageFile) {
+                formData.set('image', imageFile);
+            }
+
+            try {
+                showLoading();
+                const response = await fetch(`/api/admin/products/${generatorId}`, {
+                    method: 'PUT',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('Generator updated successfully!');
+                    closeEditGeneratorModal();
+                    loadGenerators();
+                } else {
+                    throw new Error(result.message || 'Failed to update generator');
+                }
+            } catch (error) {
+                console.error('Error updating generator:', error);
+                showToast(error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Generator actions - FIXED VERSION
+        async function editGenerator(generatorId) {
+            try {
+                showLoading();
+                
+                // Fetch generator data using the single product API
+                const response = await fetch(`/api/admin/products/${generatorId}`);
+                const data = await response.json();
+                
+                if (data.success && data.product) {
+                    const generator = data.product;
+                    
+                    // Populate edit form
+                    document.getElementById('editGeneratorId').value = generator.id;
+                    document.getElementById('editGeneratorName').value = generator.name || '';
+                    document.getElementById('editGeneratorDescription').value = generator.description || '';
+                    document.getElementById('editGeneratorPrice').value = (generator.price_cents || 0) / 100;
+                    
+                    // Populate specs
+                    const specsContainer = document.getElementById('editGeneratorSpecs');
+                    specsContainer.innerHTML = '';
+                    
+                    const specs = generator.specs || [];
+                    if (specs.length > 0) {
+                        specs.forEach((spec, index) => {
+                            addEditSpecField(spec);
+                        });
+                    } else {
+                        // Add one empty field if no specs
+                        addEditSpecField('');
+                    }
+                    
+                    // Show current image if exists
+                    const currentImageDiv = document.getElementById('editCurrentImage');
+                    const images = generator.images || [];
+                    if (images.length > 0) {
+                        const imageUrl = images[0].startsWith('/') ? images[0] : `/uploads/${images[0]}`;
+                        currentImageDiv.innerHTML = `
+                            <p><strong>Current Image:</strong></p>
+                            <img src="${imageUrl}" alt="Current generator image" 
+                                 style="max-width: 200px; border-radius: 8px; margin-top: 0.5rem;"
+                                 onerror="this.src='/images/generators/default.jpg'">
+                        `;
+                    } else {
+                        currentImageDiv.innerHTML = '<p><em>No current image</em></p>';
+                    }
+                    
+                    // Show edit modal
+                    document.getElementById('editGeneratorModal').style.display = 'block';
+                } else {
+                    showToast('Error loading generator data: ' + (data.message || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error loading generator for edit:', error);
+                showToast('Error loading generator data: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function toggleGenerator(generatorId, isActive) {
+            try {
+                // First get the current product data
+                const productData = await apiCall(`/api/admin/products/${generatorId}`);
+                
+                if (productData.success) {
+                    const product = productData.product;
+                    
+                    // Create FormData with all existing data plus the new is_active status
+                    const formData = new FormData();
+                    formData.set('name', product.name);
+                    formData.set('description', product.description);
+                    formData.set('price_cents', product.price_cents);
+                    formData.set('category', product.category);
+                    formData.set('specs', JSON.stringify(product.specs));
+                    formData.set('stock_quantity', product.stock_quantity || 0);
+                    formData.set('is_active', isActive ? 1 : 0);
+                    
+                    const response = await fetch(`/api/admin/products/${generatorId}`, {
+                        method: 'PUT',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showToast(`Generator ${isActive ? 'activated' : 'deactivated'} successfully`);
+                        loadGenerators();
+                    } else {
+                        throw new Error(result.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating generator:', error);
+                showToast('Error updating generator status', 'error');
+            }
+        }
+
+        async function deleteGenerator(generatorId) {
+            if (!confirm('Are you sure you want to delete this generator? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/products/${generatorId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Generator deleted successfully!');
+                    loadGenerators();
+                } else {
+                    alert('Error deleting generator: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error deleting generator:', error);
+                alert('Error deleting generator');
+            }
+        }
+
+        // Bulk operations
+        function toggleSelectAllGenerators() {
+            const selectAllCheckbox = document.getElementById('select-all-generators');
+            const generatorCheckboxes = document.querySelectorAll('.generator-checkbox');
+
+            generatorCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+
+        async function bulkActivateProducts() {
+            const selectedIds = Array.from(document.querySelectorAll('.generator-checkbox:checked')).map(cb => parseInt(cb.value));
+
+            if (selectedIds.length === 0) {
+                alert('Please select generators to activate');
+                return;
+            }
+
+            if (!confirm(`Activate ${selectedIds.length} generator(s)?`)) {
+                return;
+            }
+
+            try {
+                for (const id of selectedIds) {
+                    // Get current product data
+                    const productData = await apiCall(`/api/admin/products/${id}`);
+                    
+                    if (productData.success) {
+                        const product = productData.product;
+                        
+                        // Create FormData with existing data plus new status
+                        const formData = new FormData();
+                        formData.set('name', product.name);
+                        formData.set('description', product.description);
+                        formData.set('price_cents', product.price_cents);
+                        formData.set('category', product.category);
+                        formData.set('specs', JSON.stringify(product.specs));
+                        formData.set('stock_quantity', product.stock_quantity || 0);
+                        formData.set('is_active', 1);
+                        
+                        await fetch(`/api/admin/products/${id}`, {
+                            method: 'PUT',
+                            body: formData
+                        });
+                    }
+                }
+
+                showToast('Generators activated successfully!');
+                loadGenerators();
+            } catch (error) {
+                console.error('Error bulk activating generators:', error);
+                showToast('Error activating generators', 'error');
+            }
+        }
+
+        async function bulkDeactivateProducts() {
+            const selectedIds = Array.from(document.querySelectorAll('.generator-checkbox:checked')).map(cb => parseInt(cb.value));
+
+            if (selectedIds.length === 0) {
+                alert('Please select generators to deactivate');
+                return;
+            }
+
+            if (!confirm(`Deactivate ${selectedIds.length} generator(s)?`)) {
+                return;
+            }
+
+            try {
+                for (const id of selectedIds) {
+                    // Get current product data
+                    const productData = await apiCall(`/api/admin/products/${id}`);
+                    
+                    if (productData.success) {
+                        const product = productData.product;
+                        
+                        // Create FormData with existing data plus new status
+                        const formData = new FormData();
+                        formData.set('name', product.name);
+                        formData.set('description', product.description);
+                        formData.set('price_cents', product.price_cents);
+                        formData.set('category', product.category);
+                        formData.set('specs', JSON.stringify(product.specs));
+                        formData.set('stock_quantity', product.stock_quantity || 0);
+                        formData.set('is_active', 0);
+                        
+                        await fetch(`/api/admin/products/${id}`, {
+                            method: 'PUT',
+                            body: formData
+                        });
+                    }
+                }
+
+                showToast('Generators deactivated successfully!');
+                loadGenerators();
+            } catch (error) {
+                console.error('Error bulk deactivating generators:', error);
+                showToast('Error deactivating generators', 'error');
+            }
+        }
+
+        // Logout
+        async function logout() {
+            try {
+                await fetch('/api/admin/logout', { method: 'POST' });
+                window.location.href = '/admin/login.html';
+            } catch (error) {
+                console.error('Error logging out:', error);
+                window.location.href = '/admin/login.html';
+            }
+        }
+    </script>
+</body>
+</html>
